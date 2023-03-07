@@ -21,8 +21,13 @@ public class OutPacket : AbstractPacket
         stream.Write(BitConverter.GetBytes(header), 0, 4);
     }
 
-    public OutPacket(ServerHeader header) : this((uint)header) { }
-    public OutPacket(ClientHeader header) : this((uint)header) { }
+    public OutPacket(ServerHeader header) : this((uint)header)
+    {
+    }
+
+    public OutPacket(ClientHeader header) : this((uint)header)
+    {
+    }
 
     public void Encode<T>(T data)
     {
@@ -32,6 +37,8 @@ public class OutPacket : AbstractPacket
 
     public void WriteLength()
     {
+        ThrowIfDisposed();
+
         stream.Position = 0;
         stream.Write(BitConverter.GetBytes(Length - 4), 0, 4);
     }

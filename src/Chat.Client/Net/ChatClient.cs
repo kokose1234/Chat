@@ -1,6 +1,6 @@
 ﻿using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
-using ProtoChat.Common.Packet.Data.Server;
+using Chat.Common.Packet.Data.Server;
 
 namespace Chat.Client.Net;
 
@@ -43,7 +43,7 @@ internal sealed class ChatClient : TcpClient
             if (_initialized)
             {
                 using var packet = new InPacket(Decrypt(buffer));
-                var headerName = Enum.GetName(typeof(ServerHeader), packet.Header) ?? string.Format($"0x{packet.Header:X4}");
+                var headerName = FastEnum.GetName((ServerHeader) packet.Header) ?? string.Format($"0x{packet.Header:X4}");
                 Console.WriteLine($"[S->C] [{headerName}]\r\n{packet}");
 
                 if (PacketHandlers.GetHandler(packet.Header, out var handler))
@@ -94,7 +94,7 @@ internal sealed class ChatClient : TcpClient
 
     internal void Send(OutPacket buffer)
     {
-        var headerName = Enum.GetName(typeof(ServerHeader), buffer.Header) ?? string.Format($"0x{buffer.Header:X4}");
+        var headerName = FastEnum.GetName((ClientHeader) buffer.Header) ?? string.Format($"0x{buffer.Header:X4}");
 
         buffer.WriteLength();
         base.SendAsync(Encrypt(buffer.Buffer));

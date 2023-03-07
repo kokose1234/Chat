@@ -4,6 +4,7 @@ using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
 using Chat.Common.Tools;
 using Chat.Server.Data;
+using FastEnumUtility;
 using NetCoreServer;
 
 namespace Chat.Server.Net;
@@ -47,7 +48,7 @@ internal class ChatSession : TcpSession
         {
             Array.Resize(ref buffer, (int)size);
             using var packet = new InPacket(Decrypt(buffer));
-            var headerName = Enum.GetName(typeof(ServerHeader), packet.Header) ?? string.Format($"0x{packet.Header:X4}");
+            var headerName = FastEnum.GetName((ClientHeader) packet.Header) ?? string.Format($"0x{packet.Header:X4}");
             Console.WriteLine($"[C->S] [{headerName}]\r\n{packet}");
 
             if (PacketHandlers.GetHandler(packet.Header, out var handler))
@@ -74,7 +75,7 @@ internal class ChatSession : TcpSession
 
     internal void Send(OutPacket buffer)
     {
-        var headerName = Enum.GetName(typeof(ServerHeader), buffer.Header) ?? string.Format($"0x{buffer.Header:X4}");
+        var headerName = FastEnum.GetName((ServerHeader) buffer.Header) ?? string.Format($"0x{buffer.Header:X4}");
 
         buffer.WriteLength();
         base.SendAsync(Encrypt(buffer.Buffer));
