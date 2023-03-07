@@ -1,0 +1,16 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Server";
+
+message ServerLogin {
+	LoginResult result = 1;
+	string name = 2;
+
+	enum LoginResult {
+		SUCCESS = 0;
+		FAILED_DUPLICATE_USER = 1;
+		FAILED_WRONG_INFO = 2;
+		FAILED_BLOCKED = 3;
+		FAILED_UNKOWN = 4;
+	}
+}

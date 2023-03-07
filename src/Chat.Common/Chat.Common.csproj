@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath>../../Output/</BaseOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**\obj\*</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="Protos\ClientAccountRegister.proto" />
+    <AdditionalFiles Include="Protos\ClientLogin.proto" />
+    <AdditionalFiles Include="Protos\ClientPong.proto" />
+    <AdditionalFiles Include="Protos\ServerAccountRegister.proto" />
+    <AdditionalFiles Include="Protos\ServerHandshake.proto" />
+    <AdditionalFiles Include="Protos\ServerLogin.proto" />
+    <AdditionalFiles Include="Protos\ServerPing.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlowFish" Version="1.0.2" />
+    <PackageReference Include="Google.Protobuf" Version="3.22.0" />
+    <PackageReference Include="NetCoreServer" Version="7.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="NLog" Version="5.1.2" />
+    <PackageReference Include="protobuf-net" Version="3.2.12" />
+    <PackageReference Include="protobuf-net.BuildTools" Version="3.2.12">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="cd ../../Tools&#xD;&#xA;python packet_type_maker.py" />
+  </Target>
+
+</Project>

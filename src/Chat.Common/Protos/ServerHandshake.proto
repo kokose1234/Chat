@@ -1,0 +1,9 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Server";
+
+message ServerHandshake {
+  string version = 1;
+  uint64 send_iv = 2;
+  uint64 recieve_iv = 3;
+}

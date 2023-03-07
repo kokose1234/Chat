@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <BaseOutputPath>../../Output/</BaseOutputPath>
+    <StartupObject>Chat.Client.App</StartupObject>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**\obj\*</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Chat.Common\Chat.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ReactiveUI" Version="18.4.25" />
+    <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.1" />
+    <PackageReference Include="ReactiveUI.Fody" Version="18.4.25" />
+    <PackageReference Include="ReactiveUI.WPF" Version="18.4.25" />
+  </ItemGroup>
+
+</Project>

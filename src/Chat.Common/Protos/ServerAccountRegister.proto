@@ -1,0 +1,15 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Server";
+
+message ServerAccountRegister {
+	RegisterResult result = 1;
+
+	enum RegisterResult {
+		SUCCESS = 0;
+		FAIL_DUPLICATE_MAC = 1;
+		FAIL_DUPLICATE_USESRNAME = 2;
+		FAIL_BLOCKED = 3;
+		FAIL_UNKOWN = 4;
+	}
+}
