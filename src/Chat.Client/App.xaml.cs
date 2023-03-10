@@ -12,11 +12,15 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
+using System;
+using System.Linq;
+using System.Threading;
+using System.Windows;
 using Chat.Client.Net;
 using Chat.Client.Tools;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
-using ProtoChat.Common.Packet.Data.Client;
+using Chat.Common.Packet.Data.Client;
 
 namespace Chat.Client;
 

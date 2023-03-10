@@ -1,4 +1,8 @@
-﻿using Chat.Common.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Chat.Common.Net;
 
 namespace Chat.Client.Net;
 

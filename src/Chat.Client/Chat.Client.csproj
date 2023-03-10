@@ -9,6 +9,8 @@
     <StartupObject>Chat.Client.App</StartupObject>
     <ApplicationIcon>logo.ico</ApplicationIcon>
     <DefaultItemExcludes>$(DefaultItemExcludes);**\obj\*</DefaultItemExcludes>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

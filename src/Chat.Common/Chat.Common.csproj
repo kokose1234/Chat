@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <BaseOutputPath>../../Output/</BaseOutputPath>
     <DefaultItemExcludes>$(DefaultItemExcludes);**\obj\*</DefaultItemExcludes>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,9 +23,9 @@
   <ItemGroup>
     <PackageReference Include="BlowFish" Version="1.0.2" />
     <PackageReference Include="FastEnum" Version="1.8.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.22.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.22.1" />
     <PackageReference Include="NetCoreServer" Version="7.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.1.2" />
     <PackageReference Include="protobuf-net" Version="3.2.12" />
     <PackageReference Include="protobuf-net.BuildTools" Version="3.2.12">

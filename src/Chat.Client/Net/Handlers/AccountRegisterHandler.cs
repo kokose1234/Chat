@@ -1,6 +1,7 @@
-﻿using Chat.Common.Net.Packet;
+﻿using Chat.Common.Net;
+using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
-using ProtoChat.Common.Packet.Data.Server;
+using Chat.Common.Packet.Data.Server;
 
 namespace Chat.Client.Net.Handlers;
 

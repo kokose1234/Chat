@@ -1,4 +1,7 @@
-﻿namespace Chat.Client.Tools;
+﻿using System.Linq;
+using System.Net.NetworkInformation;
+
+namespace Chat.Client.Tools;
 
 internal static class Util
 {
