@@ -7,7 +7,7 @@ internal static class Program
 {
     private static void Main(string[] args)
     {
-        Console.Title = $"ProtoChat Server - {Constants.Version}";
+        Console.Title = $"Chat Server - {Constants.Version}";
 
         var server = new ChatServer("127.0.0.1", 9000);
         PacketHandlers.RegisterPackets();

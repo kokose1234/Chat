@@ -26,7 +26,7 @@ internal static class DatabaseManager
 
     internal static void Setup()
     {
-        var connection = new MySqlConnection($"Server={Options.Host};Port={Options.Port};Database=protochat;User={Options.Username};Password={Options.Password}");
+        var connection = new MySqlConnection($"Server={Options.Host};Port={Options.Port};Database=Chat;User={Options.Username};Password={Options.Password}");
         var compiler = new MySqlCompiler();
         s_factory?.Connection.Close();
         s_factory = new QueryFactory(connection, compiler);
