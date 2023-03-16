@@ -1,8 +1,14 @@
 ﻿using ReactiveUI;
 
-namespace Chat.Client2.ViewModels
+namespace Chat.Client.ViewModels
 {
-    public class ViewModelBase : ReactiveObject
+    public class ViewModelBase : ReactiveObject, IActivatableViewModel
     {
+        public ViewModelActivator Activator { get; }
+
+        public ViewModelBase()
+        {
+            Activator = new ViewModelActivator();
+        }
     }
 }

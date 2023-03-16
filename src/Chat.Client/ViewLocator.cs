@@ -1,9 +1,9 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Chat.Client2.ViewModels;
+using Chat.Client.ViewModels;
 
-namespace Chat.Client2
+namespace Chat.Client
 {
     public class ViewLocator : IDataTemplate
     {

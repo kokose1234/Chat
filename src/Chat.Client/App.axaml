@@ -1,10 +1,10 @@
 <Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:Chat.Client2"
-             x:Class="Chat.Client2.App">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             xmlns:client="clr-namespace:Chat.Client"
+             x:Class="Chat.Client.App">
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <client:ViewLocator/>
     </Application.DataTemplates>
 
     <Application.Styles>

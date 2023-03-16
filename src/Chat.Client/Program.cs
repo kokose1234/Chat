@@ -2,7 +2,7 @@
 using Avalonia;
 using Avalonia.ReactiveUI;
 
-namespace Chat.Client2
+namespace Chat.Client
 {
     internal class Program
     {

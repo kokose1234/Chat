@@ -1,20 +1,45 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:Chat.Client2.ViewModels"
+        xmlns:vm="using:Chat.Client.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="Chat.Client2.Views.MainWindow"
+        mc:Ignorable="d" Width="800" Height="500"
+        x:Class="Chat.Client.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Chat.Client2">
+        Title="" CanResize="False" ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaTitleBarHeightHint="-1"
+        Background="#17212B">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Window.Styles>
+        <Style Selector="TextBlock.TopBarButton">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Grid.CloseButton:pointerover">
+            <Setter Property="Background" Value="#E92539" />
+        </Style>
+        <Style Selector="Grid.MinButton:pointerover">
+            <Setter Property="Background" Value="#2C3847" />
+        </Style>
+    </Window.Styles>
 
+    <StackPanel x:Name="MainPanel" Width="800">
+        <Grid Name="TopBar" Background="#242F3D" Height="25" PointerPressed="TopBar_OnPointerPressed">
+            <Grid HorizontalAlignment="Right" ColumnDefinitions="25, 25">
+                <Grid Classes="MinButton" Width="25" Height="25">
+                    <TextBlock Classes="TopBarButton" Text="_" Foreground="#566571" />
+                </Grid>
+                <Grid Column="1" Classes="TopBarButton CloseButton" Width="25" Height="25">
+                    <TextBlock Classes="TopBarButton" Text="X" Foreground="#566571" />
+                </Grid>
+            </Grid>
+        </Grid>
+    </StackPanel>
 </Window>

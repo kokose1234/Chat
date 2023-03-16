@@ -4,16 +4,15 @@ using System.Threading;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Chat.Client;
 using Chat.Client.Net;
 using Chat.Client.Tools;
-using Chat.Client2.ViewModels;
-using Chat.Client2.Views;
+using Chat.Client.ViewModels;
+using Chat.Client.Views;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
 
-namespace Chat.Client2
+namespace Chat.Client
 {
     public partial class App : Application
     {
@@ -21,7 +20,7 @@ namespace Chat.Client2
         {
             Console.Title = $"Chat Client - {Constants.Version}";
             PacketHandlers.RegisterPackets();
-            _ = ChatClient.Instance;
+            //_ = ChatClient.Instance;
 
             AvaloniaXamlLoader.Load(this);
 
