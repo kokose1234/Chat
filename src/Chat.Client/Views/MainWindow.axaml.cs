@@ -1,5 +1,10 @@
+using System;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Remote;
 using Avalonia.Input;
 using Avalonia.ReactiveUI;
+using Chat.Client.Net;
 using Chat.Client.ViewModels;
 using ReactiveUI;
 
@@ -15,5 +20,15 @@ namespace Chat.Client.Views
         }
 
         private void TopBar_OnPointerPressed(object? sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
+
+        private void MinimizeButton_OnPointerPressed(object? sender, PointerPressedEventArgs e) =>
+            WindowState = WindowState.Minimized;
+
+        private void CloseButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            ChatClient.Instance.DisconnectAndStop();
+            Close();
+            Environment.Exit(0);
+        }
     }
 }
