@@ -19,16 +19,31 @@ namespace Chat.Client.Views
             InitializeComponent();
         }
 
-        private void TopBar_OnPointerPressed(object? sender, PointerPressedEventArgs e) => BeginMoveDrag(e);
+        private void TopBar_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                BeginMoveDrag(e);
+            }
+        }
 
-        private void MinimizeButton_OnPointerPressed(object? sender, PointerPressedEventArgs e) =>
-            WindowState = WindowState.Minimized;
+        private void MinimizeButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                WindowState = WindowState.Minimized;
+            }
+        }
+
 
         private void CloseButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            ChatClient.Instance.DisconnectAndStop();
-            Close();
-            Environment.Exit(0);
+            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                ChatClient.Instance.DisconnectAndStop();
+                Close();
+                Environment.Exit(0);
+            }
         }
     }
 }

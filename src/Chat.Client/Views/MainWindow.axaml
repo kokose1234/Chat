@@ -21,7 +21,9 @@
         <Style Selector="Image.TopBarButton">
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Stretch" Value="None" />
+            <Setter Property="Stretch" Value="Fill" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
         </Style>
         <Style Selector="Grid.CloseButton:pointerover">
             <Setter Property="Background" Value="#E92539" />
@@ -29,22 +31,18 @@
         <Style Selector="Grid.MinButton:pointerover">
             <Setter Property="Background" Value="#2C3847" />
         </Style>
-        <Style Selector="Image.CloseIcon:pointerover">
-            <Setter Property="Source" Value="/Assets/Buttons/close-button-hover.png" />
-        </Style>
-        <Style Selector="Image.MinimizeIcon:pointerover">
-            <Setter Property="Source" Value="/Assets/Buttons/minimize-button-hover.png" />
-        </Style>
     </Window.Styles>
 
     <StackPanel x:Name="MainPanel" Width="800">
         <Grid Name="TopBar" Background="#242F3D" Height="25" PointerPressed="TopBar_OnPointerPressed">
             <Grid HorizontalAlignment="Right" ColumnDefinitions="25, 25">
-                <Grid Name="MinimizeButton" Classes="MinButton" Width="25" Height="25" PointerPressed="MinimizeButton_OnPointerPressed">
-                    <Image Classes="TopBarButton MinimizeIcon" Source="/Assets/Buttons/minimize-button.png" />
+                <Grid Name="MinimizeButton" Classes="MinButton" Width="25" Height="25"
+                      PointerPressed="MinimizeButton_OnPointerPressed">
+                    <Image Classes="TopBarButton" Source="/Assets/Buttons/minimize-button.png" />
                 </Grid>
-                <Grid Name="CloseButton" Column="1" Classes="TopBarButton CloseButton" Width="25" Height="25" PointerPressed="CloseButton_OnPointerPressed">
-                    <Image Classes="TopBarButton CloseIcon" Source="/Assets/Buttons/close-button.png" />
+                <Grid Name="CloseButton" Column="1" Classes="TopBarButton CloseButton" Width="25" Height="25"
+                      PointerPressed="CloseButton_OnPointerPressed">
+                    <Image Classes="TopBarButton" Source="/Assets/Buttons/close-button.png" />
                 </Grid>
             </Grid>
         </Grid>
