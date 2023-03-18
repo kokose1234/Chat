@@ -20,7 +20,7 @@ namespace Chat.Client
         {
             Console.Title = $"Chat Client - {Constants.Version}";
             PacketHandlers.RegisterPackets();
-            //_ = ChatClient.Instance;
+            _ = ChatClient.Instance;
 
             AvaloniaXamlLoader.Load(this);
 

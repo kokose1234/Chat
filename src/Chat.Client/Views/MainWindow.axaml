@@ -11,40 +11,69 @@
         ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaTitleBarHeightHint="-1"
         Background="#17212B">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel />
-    </Design.DataContext>
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
 
-    <Window.Styles>
-        <Style Selector="Image.TopBarButton">
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Stretch" Value="Fill" />
-            <Setter Property="Width" Value="20" />
-            <Setter Property="Height" Value="20" />
-        </Style>
-        <Style Selector="Grid.CloseButton:pointerover">
-            <Setter Property="Background" Value="#E92539" />
-        </Style>
-        <Style Selector="Grid.MinButton:pointerover">
-            <Setter Property="Background" Value="#2C3847" />
-        </Style>
-    </Window.Styles>
+  <Window.Styles>
+    <Style Selector="Image.TopBarButton">
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Stretch" Value="Fill" />
+      <Setter Property="Width" Value="20" />
+      <Setter Property="Height" Value="20" />
+    </Style>
+    <Style Selector="Grid.CloseButton:pointerover">
+      <Setter Property="Background" Value="#E92539" />
+    </Style>
+    <Style Selector="Grid.MinButton:pointerover">
+      <Setter Property="Background" Value="#2C3847" />
+    </Style>
 
-    <StackPanel x:Name="MainPanel" Width="800">
-        <Grid Name="TopBar" Background="#242F3D" Height="25" PointerPressed="TopBar_OnPointerPressed">
-            <Grid HorizontalAlignment="Right" ColumnDefinitions="25, 25">
-                <Grid Name="MinimizeButton" Classes="MinButton" Width="25" Height="25"
-                      PointerPressed="MinimizeButton_OnPointerPressed">
-                    <Image Classes="TopBarButton" Source="/Assets/Buttons/minimize-button.png" />
-                </Grid>
-                <Grid Name="CloseButton" Column="1" Classes="TopBarButton CloseButton" Width="25" Height="25"
-                      PointerPressed="CloseButton_OnPointerPressed">
-                    <Image Classes="TopBarButton" Source="/Assets/Buttons/close-button.png" />
-                </Grid>
-            </Grid>
+    <Style Selector="TextBox.Account">
+      <Setter Property="Margin" Value="0,10" />
+      <Setter Property="Width" Value="200" />
+    </Style>
+
+    <Style Selector="Button">
+      <Setter Property="Foreground" Value="SkyBlue" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+  </Window.Styles>
+
+  <StackPanel Width="800">
+    <Grid Name="TopBar" Background="#242F3D" Height="25" PointerPressed="TopBar_OnPointerPressed">
+      <Grid HorizontalAlignment="Right" ColumnDefinitions="25, 25">
+        <Grid Name="MinimizeButton" Classes="MinButton" Width="25" Height="25"
+              PointerPressed="MinimizeButton_OnPointerPressed" PointerEnter="MinimizeButton_OnPointerEnter"
+              PointerLeave="MinimizeButton_OnPointerLeave">
+          <Image Name="MinimizeImage" Classes="TopBarButton" Source="/Assets/Buttons/minimize-button.png" />
         </Grid>
-    </StackPanel>
+        <Grid Name="CloseButton" Column="1" Classes="TopBarButton CloseButton" Width="25" Height="25"
+              PointerPressed="CloseButton_OnPointerPressed" PointerEnter="CloseButton_OnPointerEnter"
+              PointerLeave="CloseButton_OnPointerLeave">
+          <Image Name="CloseImage" Classes="TopBarButton" Source="/Assets/Buttons/close-button.png" />
+        </Grid>
+      </Grid>
+    </Grid>
+
+    <Grid x:Name="LoginPanel" Margin="0,150,0,0" RowDefinitions="*,*,*,*" HorizontalAlignment="Center" IsVisible="{Binding !IsLogined}">
+      <TextBlock Foreground="Red" FontWeight="Bold" Text="{Binding ErrorMessage}" HorizontalAlignment="Center" Margin="15,0,0,0" />
+      <WrapPanel Grid.Row="1">
+        <Image Source="/Assets/Icons/username.png" Width="25" Margin="0,0,5,0" />
+        <TextBox Name="UserName" Classes="Account" Text="{Binding Username}" />
+      </WrapPanel>
+      <WrapPanel Grid.Row="2">
+        <Image Source="/Assets/Icons/password.png" Width="25" Margin="0,0,5,0" />
+        <TextBox Name="Password" Classes="Account" PasswordChar="●" Text="{Binding Password}"/>
+      </WrapPanel>
+      <Button Name="LoginButton" Grid.Row="3" Content="로그인 / 회원가입" HorizontalAlignment="Center" Margin="20,0,0,0" Command="{Binding LoginCommand}" />
+    </Grid>
+
+    <Grid x:Name="MainPanel" Height="100" Background="White" IsVisible="{Binding IsLogined}">
+    </Grid>
+  </StackPanel>
 </Window>

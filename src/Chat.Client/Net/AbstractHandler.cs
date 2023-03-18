@@ -2,7 +2,7 @@
 
 namespace Chat.Client.Net;
 
-internal abstract class AbstractHandler
+public abstract class AbstractHandler
 {
     internal abstract void Handle(ChatClient session, InPacket packet);
 }

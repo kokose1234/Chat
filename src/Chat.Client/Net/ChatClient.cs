@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Chat.Client.ViewModels;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
@@ -12,6 +13,8 @@ internal sealed class ChatClient : TcpClient
 {
     internal static readonly Lazy<ChatClient> Lazy = new(() => new ChatClient("127.0.0.1", 9000));
     internal static ChatClient Instance => Lazy.Value;
+
+    public MainWindowViewModel ViewModel { get; set; }
 
     private byte[] _sendKey = null!;
     private byte[] _recvKey = null!;
@@ -43,7 +46,7 @@ internal sealed class ChatClient : TcpClient
     {
         if (size >= 8)
         {
-            Array.Resize(ref buffer, (int)size);
+            Array.Resize(ref buffer, (int) size);
             if (_initialized)
             {
                 using var packet = new InPacket(Decrypt(buffer));
@@ -70,7 +73,7 @@ internal sealed class ChatClient : TcpClient
             {
                 using var packet = new InPacket(buffer);
 
-                if (packet.Header == (uint)ServerHeader.ServerHandshake)
+                if (packet.Header == (uint) ServerHeader.ServerHandshake)
                 {
                     var handshake = packet.Decode<ServerHandshake>();
                     if (handshake.Version != Constants.Version)
@@ -112,7 +115,7 @@ internal sealed class ChatClient : TcpClient
 
         for (var i = 0; i < buffer.Length; i++)
         {
-            result[i] = (byte)(buffer[i] ^ _sendKey[i % 8]);
+            result[i] = (byte) (buffer[i] ^ _sendKey[i % 8]);
         }
 
         return result;
@@ -124,7 +127,7 @@ internal sealed class ChatClient : TcpClient
 
         for (var i = 0; i < buffer.Length; i++)
         {
-            result[i] = (byte)(buffer[i] ^ _recvKey[i % 8]);
+            result[i] = (byte) (buffer[i] ^ _recvKey[i % 8]);
         }
 
         return result;

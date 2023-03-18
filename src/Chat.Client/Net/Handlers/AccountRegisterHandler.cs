@@ -10,7 +10,7 @@ internal class AccountRegisterHandler : AbstractHandler
 {
     internal override void Handle(ChatClient session, InPacket packet)
     {
-        var response = packet.Decode<ServerAccountRegister>();
+        
         
     }
 }
