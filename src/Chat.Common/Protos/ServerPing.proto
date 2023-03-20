@@ -3,6 +3,5 @@
 option csharp_namespace = "Chat.Common.Packet.Data.Server";
 
 message ServerPing {
-	uint64 send_iv = 1;
-	uint64 recieve_iv = 2;
+	int32 key = 1;
 }

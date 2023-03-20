@@ -3,7 +3,6 @@ using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
 using Chat.Common.Tools;
-using Chat.Server.Data;
 using FastEnumUtility;
 using NetCoreServer;
 
@@ -26,7 +25,7 @@ internal class ChatSession : TcpSession
         _remoteEndpoint = (Socket.RemoteEndPoint as IPEndPoint)?.Address.ToString()!;
         Client = new ChatClient(this);
 
-        using var packet = new OutPacket((uint)ServerHeader.ServerHandshake);
+        using var packet = new OutPacket((uint) ServerHeader.ServerHandshake);
         packet.Encode(GetHandshake());
         packet.WriteLength();
 
@@ -46,7 +45,7 @@ internal class ChatSession : TcpSession
     {
         if (size >= 8)
         {
-            Array.Resize(ref buffer, (int)size);
+            Array.Resize(ref buffer, (int) size);
             using var packet = new InPacket(Decrypt(buffer));
             var headerName = FastEnum.GetName((ClientHeader) packet.Header) ?? string.Format($"0x{packet.Header:X4}");
             Console.WriteLine($"[C->S] [{headerName}]\r\n{packet}");
@@ -73,6 +72,13 @@ internal class ChatSession : TcpSession
         }
     }
 
+    internal void Close()
+    {
+        Disconnect();
+        while (IsConnected)
+            Thread.Yield();
+    }
+
     internal void Send(OutPacket buffer)
     {
         var headerName = FastEnum.GetName((ServerHeader) buffer.Header) ?? string.Format($"0x{buffer.Header:X4}");
@@ -89,7 +95,7 @@ internal class ChatSession : TcpSession
 
         for (var i = 0; i < buffer.Length; i++)
         {
-            result[i] = (byte)(buffer[i] ^ _recvKey[i % 8]);
+            result[i] = (byte) (buffer[i] ^ _recvKey[i % 8]);
         }
 
         return result;
@@ -101,7 +107,7 @@ internal class ChatSession : TcpSession
 
         for (var i = 0; i < buffer.Length; i++)
         {
-            result[i] = (byte)(buffer[i] ^ _sendKey[i % 8]);
+            result[i] = (byte) (buffer[i] ^ _sendKey[i % 8]);
         }
 
         return result;
