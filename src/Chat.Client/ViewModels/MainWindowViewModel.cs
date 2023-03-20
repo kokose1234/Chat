@@ -1,4 +1,5 @@
 ﻿using System.Reactive;
+using Chat.Client.Models;
 using Chat.Client.Net;
 using Chat.Client.Tools;
 using Chat.Common.Net.Packet;
@@ -18,23 +19,39 @@ namespace Chat.Client.ViewModels
         public string Password { get; set; } = string.Empty;
 
         [Reactive]
-        public string ErrorMessage { get; set; } = string.Empty;
+        public LoginMessage LoginMessage { get; set; } = new();
 
         [Reactive]
         public bool IsLogined { get; set; }
 
         public ReactiveCommand<Unit, Unit> LoginCommand { get; }
+        public ReactiveCommand<Unit, Unit> RegisterCommand { get; }
 
         public MainWindowViewModel()
         {
             ChatClient.Instance.ViewModel = this;
             LoginCommand = ReactiveCommand.Create(Login);
+            RegisterCommand = ReactiveCommand.Create(Register);
         }
 
         private void Login()
         {
             using var packet = new OutPacket(ClientHeader.ClientLogin);
-            var request = new ClientLogin()
+            var request = new ClientLogin
+            {
+                UserName = Username,
+                Password = Password,
+                MacAddress = Util.GetMacAddress()
+            };
+
+            packet.Encode(request);
+            ChatClient.Instance.Send(packet);
+        }
+
+        private void Register()
+        {
+            using var packet = new OutPacket(ClientHeader.ClientAccountRegister);
+            var request = new ClientLogin
             {
                 UserName = Username,
                 Password = Password,

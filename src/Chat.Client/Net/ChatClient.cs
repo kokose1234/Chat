@@ -42,7 +42,7 @@ internal sealed class ChatClient : TcpClient
         DisconnectAndStop();
     }
 
-    protected override void OnReceived(byte[] buffer, long offset, long size)
+    protected override async void OnReceived(byte[] buffer, long offset, long size)
     {
         if (size >= 8)
         {
@@ -57,7 +57,7 @@ internal sealed class ChatClient : TcpClient
                 {
                     if (handler != null)
                     {
-                        handler.Handle(this, packet);
+                        await handler.Handle(this, packet);
                     }
                     else
                     {

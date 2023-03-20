@@ -1,8 +1,9 @@
-﻿using Chat.Common.Net.Packet;
+﻿using System.Threading.Tasks;
+using Chat.Common.Net.Packet;
 
 namespace Chat.Client.Net;
 
 public abstract class AbstractHandler
 {
-    internal abstract void Handle(ChatClient session, InPacket packet);
+    internal abstract Task Handle(ChatClient session, InPacket inPacket);
 }

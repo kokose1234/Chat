@@ -11,7 +11,7 @@ namespace Chat.Server.Net.Handlers;
 [PacketHandler(ClientHeader.ClientAccountRegister)]
 internal class AccountRegisterHandler : AbstractHandler
 {
-    internal override void Handle(ChatSession session, InPacket inPacket) //TODO: 맥주소 밴
+    internal override async Task Handle(ChatSession session, InPacket inPacket) //TODO: 맥주소 밴
     {
         var packet = new OutPacket(ServerHeader.ServerAccountRegister);
 
@@ -19,7 +19,7 @@ internal class AccountRegisterHandler : AbstractHandler
         {
             var request = inPacket.Decode<ClientAccountRegister>();
 
-            var account = DatabaseManager.Factory.Query("accounts").Get().ToArray();
+            var account = (await DatabaseManager.Factory.Query("accounts").GetAsync()).ToArray();
 
             if (account.FirstOrDefault(x => x.registered_mac == request.MacAddress) != null)
             {
@@ -35,7 +35,7 @@ internal class AccountRegisterHandler : AbstractHandler
                 return;
             }
 
-            DatabaseManager.Factory.Query("accounts").Insert(new
+            await DatabaseManager.Factory.Query("accounts").InsertAsync(new
             {
                 username = request.UserName,
                 password = request.Password,

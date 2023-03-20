@@ -4,5 +4,5 @@ namespace Chat.Server.Net;
 
 public abstract class AbstractHandler
 {
-    internal abstract void Handle(ChatSession session, InPacket packet);
+    internal abstract Task Handle(ChatSession session, InPacket inPacket);
 }
