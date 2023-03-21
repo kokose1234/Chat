@@ -1,4 +1,7 @@
-﻿using Chat.Server.Database;
+﻿using Chat.Common.Net.Packet;
+using Chat.Common.Net.Packet.Header;
+using Chat.Common.Packet.Data.Client;
+using Chat.Server.Database;
 using Chat.Server.Net;
 
 namespace Chat.Server;

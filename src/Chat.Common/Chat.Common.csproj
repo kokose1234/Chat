@@ -11,13 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="Protos\ClientAccountRegister.proto" />
-    <AdditionalFiles Include="Protos\ClientLogin.proto" />
-    <AdditionalFiles Include="Protos\ClientPong.proto" />
-    <AdditionalFiles Include="Protos\ServerAccountRegister.proto" />
-    <AdditionalFiles Include="Protos\ServerHandshake.proto" />
-    <AdditionalFiles Include="Protos\ServerLogin.proto" />
-    <AdditionalFiles Include="Protos\ServerPing.proto" />
+    <AdditionalFiles Include="Proto\ClientAccountRegister.proto" />
+    <AdditionalFiles Include="Proto\ClientEditProfile.proto" />
+    <AdditionalFiles Include="Proto\ClientLogin.proto" />
+    <AdditionalFiles Include="Proto\ClientPong.proto" />
+    <AdditionalFiles Include="Proto\ServerAccountRegister.proto" />
+    <AdditionalFiles Include="Proto\ServerHandshake.proto" />
+    <AdditionalFiles Include="Proto\ServerLogin.proto" />
+    <AdditionalFiles Include="Proto\ServerPing.proto" />
   </ItemGroup>
 
   <ItemGroup>

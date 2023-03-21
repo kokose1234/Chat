@@ -21,7 +21,7 @@ def save_packet_header(names, packet_type):
         shutil.copyfileobj(output_str, fd)
 
 
-proto_path = '../src/Chat.Common/Protos'
+proto_path = '../src/Chat.Common/Proto'
 file_list = []
 
 for root, dirs, files in walk(proto_path):
