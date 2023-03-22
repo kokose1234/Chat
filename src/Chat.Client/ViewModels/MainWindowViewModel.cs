@@ -2,6 +2,7 @@
 using Chat.Client.Models;
 using Chat.Client.Net;
 using Chat.Client.Tools;
+using Chat.Client.Views;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
