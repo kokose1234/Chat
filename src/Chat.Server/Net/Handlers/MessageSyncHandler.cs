@@ -18,26 +18,9 @@ public class MessageSyncHandler : AbstractHandler
         using var packet = new OutPacket(ServerHeader.ServerMessageSync);
         var response = new ServerMessageSync();
 
-        if (request.LastMessageIds.Count == 0)
+        using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
-            packet.Encode(response);
-            session.Send(packet);
-            return;
-        }
-
-        foreach (var (channel, lastMessage) in request.LastMessageIds)
-        {
-            var messages = await DatabaseManager.Factory.Query("messages")
-                                                .Where("id", ">", lastMessage.ToString())
-                                                .GetAsync();
-
-            foreach (var message in messages)
-            {
-                response.Messages.Add(new Message
-                {
-
-                });
-            }
+            // var channels = await DatabaseManager.Factory.Query("channel-users").Where()
         }
     }
 }

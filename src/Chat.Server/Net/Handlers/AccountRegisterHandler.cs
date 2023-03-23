@@ -19,34 +19,43 @@ internal class AccountRegisterHandler : AbstractHandler
         {
             var request = inPacket.Decode<ClientAccountRegister>();
 
-            var account = (await DatabaseManager.Factory.Query("accounts").GetAsync()).ToArray();
-
-            if (account.FirstOrDefault(x => x.registered_mac == request.MacAddress) != null)
+            using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
             {
-                packet.Encode(new ServerAccountRegister {Result = ServerAccountRegister.RegisterResult.FailDuplicateMac});
-                session.Send(packet);
-                return;
+                var account = (await DatabaseManager.Factory.Query("accounts").GetAsync()).ToArray();
+
+                if (account.FirstOrDefault(x => x.registered_mac == request.MacAddress) != null)
+                {
+                    packet.Encode(new ServerAccountRegister
+                        { Result = ServerAccountRegister.RegisterResult.FailDuplicateMac });
+                    session.Send(packet);
+                    return;
+                }
+
+                if (account.FirstOrDefault(x => x.username == request.UserName) != null)
+                {
+                    packet.Encode(new ServerAccountRegister
+                        { Result = ServerAccountRegister.RegisterResult.FailDuplicateUsesrname });
+                    session.Send(packet);
+                    return;
+                }
             }
 
-            if (account.FirstOrDefault(x => x.username == request.UserName) != null)
+            using (var mutex = await DatabaseManager.Mutex.WriterLockAsync())
             {
-                packet.Encode(new ServerAccountRegister {Result = ServerAccountRegister.RegisterResult.FailDuplicateUsesrname});
-                session.Send(packet);
-                return;
+                await DatabaseManager.Factory.Query("accounts").InsertAsync(new
+                {
+                    username = request.UserName,
+                    password = request.Password,
+                    registered_mac = request.MacAddress
+                });
             }
 
-            await DatabaseManager.Factory.Query("accounts").InsertAsync(new
-            {
-                username = request.UserName,
-                password = request.Password,
-                registered_mac = request.MacAddress
-            });
-            packet.Encode(new ServerAccountRegister {Result = ServerAccountRegister.RegisterResult.Success});
+            packet.Encode(new ServerAccountRegister { Result = ServerAccountRegister.RegisterResult.Success });
             session.Send(packet);
         }
         catch (Exception ex)
         {
-            packet.Encode(new ServerAccountRegister {Result = ServerAccountRegister.RegisterResult.FailUnkown});
+            packet.Encode(new ServerAccountRegister { Result = ServerAccountRegister.RegisterResult.FailUnkown });
             session.Send(packet);
             Console.WriteLine(ex);
         }

@@ -16,37 +16,43 @@ public class LoginHandler : AbstractHandler
     {
         using var packet = new OutPacket(ServerHeader.ServerLogin);
         var request = inPacket.Decode<ClientLogin>();
-        var account = (await DatabaseManager.Factory.Query("accounts").Where("username", request.UserName).GetAsync()).ToImmutableArray();
 
-        if (account.Length == 0)
+        using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
-            packet.Encode(new ServerLogin {Result = ServerLogin.LoginResult.FailedWrongInfo});
+            var account =
+                (await DatabaseManager.Factory.Query("accounts").Where("username", request.UserName).GetAsync())
+                .ToImmutableArray();
+
+            if (account.Length == 0)
+            {
+                packet.Encode(new ServerLogin { Result = ServerLogin.LoginResult.FailedWrongInfo });
+                session.Send(packet);
+                return;
+            }
+
+            if (account[0].password != request.Password)
+            {
+                packet.Encode(new ServerLogin { Result = ServerLogin.LoginResult.FailedWrongInfo });
+                session.Send(packet);
+                return;
+            }
+
+            packet.Encode(new ServerLogin
+            {
+                Id = account[0].id,
+                Result = ServerLogin.LoginResult.Success,
+                Name = account[0].name,
+                IsAdmin = account[0].admin == 1,
+            });
+
+            if (!ChatServer.Clients.ContainsKey(session.Id.ToString())) return;
+            var client = ChatServer.Clients[session.Id.ToString()];
+            client.Id = account[0].id;
+            client.Username = account[0].username;
+            client.Name = account[0].name;
+            client.IsAdmin = account[0].admin == 1;
+
             session.Send(packet);
-            return;
         }
-
-        if (account[0].password != request.Password)
-        {
-            packet.Encode(new ServerLogin {Result = ServerLogin.LoginResult.FailedWrongInfo});
-            session.Send(packet);
-            return;
-        }
-
-        packet.Encode(new ServerLogin
-        {
-            Id = account[0].id,
-            Result = ServerLogin.LoginResult.Success,
-            Name = account[0].name,
-            IsAdmin = account[0].admin == 1,
-        });
-
-        if (!ChatServer.Clients.ContainsKey(session.Id.ToString())) return;
-        var client = ChatServer.Clients[session.Id.ToString()];
-        client.Id = account[0].id;
-        client.Username = account[0].username;
-        client.Name = account[0].name;
-        client.IsAdmin = account[0].admin == 1;
-
-        session.Send(packet);
     }
 }

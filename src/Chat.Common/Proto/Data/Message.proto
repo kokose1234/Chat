@@ -3,11 +3,13 @@ syntax = "proto3";
 option csharp_namespace = "Chat.Common.Data";
 
 message Message {
-	uint32 channel_id = 1;
-	uint32 id = 2;
-	uint32 sender = 3;
-	uint64 date = 4;
-	optional string text = 5;
-	optional string attatchment = 6;
-	bool encrypted = 7;
+  uint32 channel_id = 1;
+  uint32 id = 2;
+  uint32 sender = 3;
+  uint64 date = 4;
+  oneof content {
+    string text = 5;
+    string attachment = 6;
+  }
+  bool encrypted = 7;
 }

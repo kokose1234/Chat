@@ -33,7 +33,7 @@ namespace Chat.Client.ViewModels
         #endregion
 
         [Reactive]
-        public string SearchTerm { get; set; }
+        public string SearchTerm { get; set; } = string.Empty;
 
         public MainWindowViewModel()
         {
