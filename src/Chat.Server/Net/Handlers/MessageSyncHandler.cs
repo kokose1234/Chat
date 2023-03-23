@@ -1,4 +1,5 @@
-﻿using Chat.Common.Data;
+﻿using System.Collections.Immutable;
+using Chat.Common.Data;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
@@ -20,7 +21,27 @@ public class MessageSyncHandler : AbstractHandler
 
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
-            // var channels = await DatabaseManager.Factory.Query("channel-users").Where()
+            var unsentMessages = (await DatabaseManager.Factory.Query("channel_users")
+                                                       .Join("messages", "channel_users.channel_id", "messages.channel_id")
+                                                       .Select("messages.*")
+                                                       .Where("channel_users.user_id", session.Client.Id.ToString())
+                                                       .Where("messages.id", ">", request.LastMessageId.ToString())
+                                                       .GetAsync()).ToImmutableArray();
+            var messages = unsentMessages.Select(x => new Message
+            {
+                Id = x.id,
+                ChannelId = x.channel_id,
+                Sender = x.user_id,
+                Date = x.date,
+                Text = x.message,
+                Attachment = (byte[]) x.attachment,
+                Encrypted = x.encrypted == 1
+            });
+
+            response.Messages.AddRange(messages);
         }
+
+        packet.Encode(response);
+        session.Send(packet);
     }
 }

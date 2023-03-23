@@ -1,7 +1,4 @@
-﻿using Chat.Common.Net.Packet;
-using Chat.Common.Net.Packet.Header;
-using Chat.Common.Packet.Data.Client;
-using Chat.Server.Database;
+﻿using Chat.Server.Database;
 using Chat.Server.Net;
 
 namespace Chat.Server;
@@ -19,12 +16,19 @@ internal static class Program
 
         while (true)
         {
-            var command = Console.ReadLine();
+            var command = Console.ReadLine() ?? "";
+            var commands = command.Split(' ');
 
-            switch (command)
+            switch (commands[0])
             {
                 case "/exit":
                     return;
+                case "/wipe":
+                    DatabaseManager.Factory.Statement("truncate table messages");
+                    DatabaseManager.Factory.Statement("truncate table channel_users");
+                    DatabaseManager.Factory.Statement("truncate table channels");
+                    DatabaseManager.Factory.Statement("truncate table accounts");
+                    break;
             }
         }
     }

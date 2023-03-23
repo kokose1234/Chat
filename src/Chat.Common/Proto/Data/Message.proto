@@ -1,15 +1,15 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 option csharp_namespace = "Chat.Common.Data";
 
 message Message {
-  uint32 channel_id = 1;
-  uint32 id = 2;
+  uint32 id = 1;
+  uint32 channel_id = 2;
   uint32 sender = 3;
-  uint64 date = 4;
-  oneof content {
-    string text = 5;
-    string attachment = 6;
-  }
+  google.protobuf.Timestamp date = 4;
+  string text = 5;
+  bytes attachment = 6;
   bool encrypted = 7;
 }

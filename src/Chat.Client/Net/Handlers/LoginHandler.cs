@@ -3,6 +3,7 @@ using Chat.Client.Data.Types;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
+using Chat.Common.Packet.Data.Client;
 using Chat.Common.Packet.Data.Server;
 
 namespace Chat.Client.Net.Handlers;
@@ -17,8 +18,19 @@ internal class LoginHandler : AbstractHandler
         switch (data.Result)
         {
             case ServerLogin.LoginResult.Success:
+            {
                 session.ViewModel.IsLogined = true;
+
+                using var packet = new OutPacket(ClientHeader.ClientMessageSync);
+                var request = new ClientMessageSync
+                {
+                    LastMessageId = 0 //TODO: use LiteDB
+                };
+
+                packet.Encode(request);
+                session.Send(packet);
                 break;
+            }
             case ServerLogin.LoginResult.FailedDuplicateUser:
                 session.ViewModel.LoginMessage = new()
                 {
