@@ -8,9 +8,11 @@ using Chat.Client.Net;
 using Chat.Client.Tools;
 using Chat.Client.ViewModels;
 using Chat.Client.Views;
+using Chat.Common.Data;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
+using Chat.Common.Packet.Data.Server;
 
 namespace Chat.Client
 {
@@ -18,9 +20,9 @@ namespace Chat.Client
     {
         public override void Initialize()
         {
+            _ = ChatClient.Instance;
             Console.Title = $"Chat Client - {Constants.Version}";
             PacketHandlers.RegisterPackets();
-            _ = ChatClient.Instance;
 
             AvaloniaXamlLoader.Load(this);
 

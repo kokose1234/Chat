@@ -13,6 +13,8 @@ namespace Chat.Client.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        #region Login
+
         [Reactive]
         public string Username { get; set; } = string.Empty;
 
@@ -27,6 +29,11 @@ namespace Chat.Client.ViewModels
 
         public ReactiveCommand<Unit, Unit> LoginCommand { get; }
         public ReactiveCommand<Unit, Unit> RegisterCommand { get; }
+
+        #endregion
+
+        [Reactive]
+        public string SearchTerm { get; set; }
 
         public MainWindowViewModel()
         {

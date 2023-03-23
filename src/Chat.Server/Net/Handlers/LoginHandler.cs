@@ -32,7 +32,21 @@ public class LoginHandler : AbstractHandler
             return;
         }
 
-        packet.Encode(new ServerLogin {Result = ServerLogin.LoginResult.Success});
+        packet.Encode(new ServerLogin
+        {
+            Id = account[0].id,
+            Result = ServerLogin.LoginResult.Success,
+            Name = account[0].name,
+            IsAdmin = account[0].admin == 1,
+        });
+
+        if (!ChatServer.Clients.ContainsKey(session.Id.ToString())) return;
+        var client = ChatServer.Clients[session.Id.ToString()];
+        client.Id = account[0].id;
+        client.Username = account[0].username;
+        client.Name = account[0].name;
+        client.IsAdmin = account[0].admin == 1;
+
         session.Send(packet);
     }
 }

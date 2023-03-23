@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Client";
+
+message ClientMessageSync {
+	map<uint32, uint32> last_message_ids = 1;
+}

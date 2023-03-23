@@ -10,6 +10,11 @@ internal class ChatClient
     public long LastPongTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
     public int LastPingKey { get; set; }
 
+    public uint Id { get; set; }
+    public string Username { get; set; }
+    public string Name { get; set; }
+    public bool IsAdmin { get; set; }
+
     private readonly Timer _pingTimer;
     private readonly ChatSession _session;
 

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "Data/Message.proto";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Server";
+
+message ServerMessageSync {
+	repeated Message messages = 1;
+}

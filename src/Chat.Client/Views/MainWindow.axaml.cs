@@ -73,5 +73,17 @@ namespace Chat.Client.Views
             var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/close-button.png"));
             CloseImage.Source = new Bitmap(asset);
         }
+
+        private void MenuButton_OnPointerEnter(object? sender, PointerEventArgs e)
+        {
+            var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/menu-hover.png"));
+            MenuImage.Source = new Bitmap(asset);
+        }
+
+        private void MenuButton_OnPointerLeave(object? sender, PointerEventArgs e)
+        {
+            var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/menu.png"));
+            MenuImage.Source = new Bitmap(asset);
+        }
     }
 }
