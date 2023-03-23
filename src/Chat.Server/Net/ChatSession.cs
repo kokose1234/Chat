@@ -8,6 +8,7 @@ using NetCoreServer;
 
 namespace Chat.Server.Net;
 
+//TODO: 리시브, 샌드 스레드 분리
 internal class ChatSession : TcpSession
 {
     internal ChatClient Client { get; private set; } = null!;
@@ -15,6 +16,13 @@ internal class ChatSession : TcpSession
     private string _remoteEndpoint = "";
     private byte[] _sendKey = new byte[8];
     private byte[] _recvKey = new byte[8];
+
+    private int _sendCount = 0;
+    private int _recvCount = 0;
+
+    private Queue<ReadOnlyMemory<byte>> _rawRecvQueue = new();
+    private Queue<InPacket> _recvQueue = new();
+    private Queue<OutPacket> _sendQueue = new();
 
     public ChatSession(TcpServer server) : base(server) { }
 
@@ -87,6 +95,8 @@ internal class ChatSession : TcpSession
         base.SendAsync(Encrypt(buffer.Buffer));
         Console.WriteLine($"[S->C] [{headerName}]\r\n{buffer}");
         buffer.Dispose();
+
+        Interlocked.Increment(ref _sendCount);
     }
 
     private byte[] Encrypt(byte[] buffer)
@@ -121,5 +131,10 @@ internal class ChatSession : TcpSession
             SendIv = BitConverter.ToUInt64(_sendKey),
             RecieveIv = BitConverter.ToUInt64(_recvKey)
         };
+    }
+
+    private static void ReceiveWorker()
+    {
+        while (true) { }
     }
 }
