@@ -14,6 +14,21 @@ internal static class Program
         DatabaseManager.Setup();
         server.Start();
 
+        // var data = File.ReadAllBytes("./test.png");
+        //
+        // for (var i = 0; i < 10; i++)
+        // {
+        //     DatabaseManager.Factory.Query("messages").Insert(new
+        //     {
+        //         channel_id = 1,
+        //         user_id = 1,
+        //         date = 0,
+        //         message = (string?)null,
+        //         attachment = data,
+        //         is_encrypted = 0
+        //     });
+        // }
+
         while (true)
         {
             var command = Console.ReadLine() ?? "";

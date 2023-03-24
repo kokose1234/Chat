@@ -2,7 +2,7 @@
 
 namespace Chat.Common.Net;
 
-public class PacketHandler : System.Attribute
+public class PacketHandler : Attribute
 {
     public uint Header { get; } = 0;
         

@@ -1,10 +1,12 @@
-﻿using System.Net;
+﻿using System.Collections.Concurrent;
+using System.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
 using Chat.Common.Tools;
 using FastEnumUtility;
 using NetCoreServer;
+using Nito.AsyncEx;
 
 namespace Chat.Server.Net;
 
@@ -17,14 +19,20 @@ internal class ChatSession : TcpSession
     private byte[] _sendKey = new byte[8];
     private byte[] _recvKey = new byte[8];
 
-    private int _sendCount = 0;
-    private int _recvCount = 0;
+    private uint _lastPacketSize = 0;
+    private readonly List<ArraySegment<byte>> _incompletePackets = new();
+    private readonly ConcurrentQueue<ArraySegment<byte>> _rawRecvQueue = new();
 
-    private Queue<ReadOnlyMemory<byte>> _rawRecvQueue = new();
-    private Queue<InPacket> _recvQueue = new();
-    private Queue<OutPacket> _sendQueue = new();
+    private readonly AsyncLock _lock = new();
+    private readonly AsyncConditionVariable _recvCondition;
 
-    public ChatSession(TcpServer server) : base(server) { }
+
+    public ChatSession(TcpServer server) : base(server)
+    {
+        _recvCondition = new(_lock);
+        var t = new Thread(ReceiveWorker);
+        t.Start();
+    }
 
     protected override void OnConnected()
     {
@@ -35,9 +43,12 @@ internal class ChatSession : TcpSession
 
         using var packet = new OutPacket((uint) ServerHeader.ServerHandshake);
         packet.Encode(GetHandshake());
-        packet.WriteLength();
 
-        base.SendAsync(packet.Buffer);
+        var data = new byte[packet.Length + 4];
+        Array.Copy(BitConverter.GetBytes(packet.Length), 0, data, 0, 4);
+        Array.Copy(packet.Buffer, 0, data, 4, packet.Length);
+
+        base.SendAsync(data);
 
         ChatServer.Clients.TryAdd(Id.ToString(), Client);
         Console.WriteLine($"{_remoteEndpoint}가 연결됨");
@@ -49,34 +60,53 @@ internal class ChatSession : TcpSession
         Console.WriteLine($"{_remoteEndpoint}가 연결 해제됨");
     }
 
-    protected override async void OnReceived(byte[] buffer, long offset, long size)
+    protected override void OnReceived(byte[] buffer, long offset, long size)
     {
-        if (size >= 8)
+        if (size < 4)
         {
-            Array.Resize(ref buffer, (int) size);
-            using var packet = new InPacket(Decrypt(buffer));
-            var headerName = FastEnum.GetName((ClientHeader) packet.Header) ?? string.Format($"0x{packet.Header:X4}");
-            Console.WriteLine($"[C->S] [{headerName}]\r\n{packet}");
+            Console.WriteLine("패킷 사이즈가 너무 작음.");
+            return;
+        }
 
-            if (PacketHandlers.GetHandler(packet.Header, out var handler))
+        var span = new ReadOnlySpan<byte>(buffer, (int) offset, (int) size);
+        for (var index = 0; index < size;)
+        {
+            if (_incompletePackets.Count == 0)
             {
-                if (handler != null)
+                var packetSize = BitConverter.ToInt32(span.Slice(index, 4)) + 4;
+                if (packetSize > size - index)
                 {
-                    await handler.Handle(this, packet);
+                    _lastPacketSize = (uint) packetSize;
+                    _incompletePackets.Add(new(buffer, (int) offset + index, (int) size - index));
+                    return;
                 }
-                else
-                {
-                    Console.WriteLine($"패킷 Id {packet.Header}의 패킷 핸들러가 존재하지 않음.");
-                }
+
+                _rawRecvQueue.Enqueue(new ArraySegment<byte>(buffer, (int) offset + index, packetSize + 4));
+                _recvCondition.Notify();
+                index += packetSize + 4;
             }
             else
             {
-                Console.WriteLine("알 수 없는 패킷을 수신함.");
+                var totalReceivedBytes = _incompletePackets.Sum(x => x.Count);
+                var remainingBytes = _lastPacketSize - totalReceivedBytes;
+
+                if (remainingBytes > size - index)
+                {
+                    _incompletePackets.Add(new(buffer, (int) offset + index, (int) size - index));
+                    return;
+                }
+
+                _incompletePackets.Add(new(buffer, (int) offset + index, (int) remainingBytes));
+
+                var data = _incompletePackets
+                           .SelectMany(segment => segment.Array[segment.Offset..(segment.Offset + segment.Count)])
+                           .ToArray();
+
+                _rawRecvQueue.Enqueue(new(data));
+                _recvCondition.Notify();
+                _incompletePackets.Clear();
+                index += (int) remainingBytes;
             }
-        }
-        else
-        {
-            Console.WriteLine("패킷 사이즈가 너무 작음.");
         }
     }
 
@@ -89,14 +119,20 @@ internal class ChatSession : TcpSession
 
     internal void Send(OutPacket buffer)
     {
-        var headerName = FastEnum.GetName((ServerHeader) buffer.Header) ?? string.Format($"0x{buffer.Header:X4}");
+        var data = new byte[buffer.Length + 4];
+        var encrypted = Encrypt(buffer.Buffer);
 
-        buffer.WriteLength();
-        base.SendAsync(Encrypt(buffer.Buffer));
-        Console.WriteLine($"[S->C] [{headerName}]\r\n{buffer}");
+        Array.Copy(BitConverter.GetBytes(buffer.Length), 0, data, 0, 4);
+        Array.Copy(encrypted, 0, data, 4, encrypted.Length);
+
+        base.SendAsync(data);
         buffer.Dispose();
 
-        Interlocked.Increment(ref _sendCount);
+        if (data.Length <= 1024)
+        {
+            var headerName = FastEnum.GetName((ServerHeader) buffer.Header) ?? string.Format($"0x{buffer.Header:X4}");
+            Console.WriteLine($"[S->C] [{headerName}]\r\n{buffer}");
+        }
     }
 
     private byte[] Encrypt(byte[] buffer)
@@ -133,8 +169,48 @@ internal class ChatSession : TcpSession
         };
     }
 
-    private static void ReceiveWorker()
+    private async void ReceiveWorker()
     {
-        while (true) { }
+        while (true)
+        {
+            await _recvCondition.WaitAsync();
+
+            while (_rawRecvQueue.TryDequeue(out var buffer))
+            {
+                var length = BitConverter.ToUInt32(buffer.Array!, buffer.Offset);
+                if (length < 4)
+                {
+                    Console.WriteLine("패킷 사이즈가 너무 작음.");
+                    return;
+                }
+
+                var data = new byte[length];
+                Array.Copy(buffer.Array!, buffer.Offset + 4, data, 0, length);
+
+                using var packet = new InPacket(Decrypt(data), length);
+
+                if (data.Length <= 1024)
+                {
+                    var headerName = FastEnum.GetName((ClientHeader) packet.Header) ?? string.Format($"0x{packet.Header:X4}");
+                    Console.WriteLine($"[C->S] [{headerName}]\r\n{packet}");
+                }
+
+                if (PacketHandlers.GetHandler(packet.Header, out var handler))
+                {
+                    if (handler != null)
+                    {
+                        await handler.Handle(this, packet);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"패킷 Id {packet.Header}의 패킷 핸들러가 존재하지 않음.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("알 수 없는 패킷을 수신함.");
+                }
+            }
+        }
     }
 }

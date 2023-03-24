@@ -12,7 +12,6 @@ public class OutPacket : AbstractPacket
     {
         stream = new MemoryStream(size);
         Disposed = false;
-        stream.Seek(4, SeekOrigin.Begin); // skip 4 bytes for packet length
     }
 
     public OutPacket(uint header) : this()
@@ -33,14 +32,6 @@ public class OutPacket : AbstractPacket
     {
         ThrowIfDisposed();
         Serializer.Serialize(stream, data);
-    }
-
-    public void WriteLength()
-    {
-        ThrowIfDisposed();
-
-        stream.Position = 0;
-        stream.Write(BitConverter.GetBytes(Length - 4), 0, 4);
     }
 
     private void ThrowIfDisposed()

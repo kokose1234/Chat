@@ -11,6 +11,9 @@ internal class ChatServer : TcpServer
     public ChatServer(string address, int port) : base(address, port)
     {
         Instance = this;
+        OptionReceiveBufferSize = 65536;
+        OptionNoDelay = true;
+        OptionKeepAlive = true;
     }
 
     protected override TcpSession CreateSession() => new ChatSession(this);

@@ -32,7 +32,7 @@ internal static class DatabaseManager
     {
         var connection =
             new MySqlConnection(
-                $"Server={Options.Host};Port={Options.Port};Database=chat;User={Options.Username};Password={Options.Password}");
+                $"Server={Options.Host};Port={Options.Port};Database=chat;User={Options.Username};Password={Options.Password};convert zero datetime=True");
         var compiler = new MySqlCompiler();
         s_factory?.Connection.Close();
         s_factory = new QueryFactory(connection, compiler);

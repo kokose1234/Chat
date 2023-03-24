@@ -7,15 +7,10 @@ public class InPacket : AbstractPacket
     public uint PacketLen { get; }
     public uint Header { get; }
 
-    public InPacket(byte[] buffer, bool readSize = true, bool readHeader = true)
+    public InPacket(byte[] buffer, uint size, bool readHeader = true)
     {
         stream = new MemoryStream(buffer, false);
-
-        if (readSize)
-        {
-            PacketLen = BitConverter.ToUInt32(buffer, Position);
-            stream.Seek(4, SeekOrigin.Current);
-        }
+        PacketLen = size;
 
         if (readHeader)
         {
