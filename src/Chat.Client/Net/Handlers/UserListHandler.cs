@@ -6,14 +6,14 @@ using Chat.Common.Packet.Data.Server;
 
 namespace Chat.Client.Net.Handlers;
 
-[PacketHandler(ServerHeader.ServerMessageSync)]
-public class MessageSyncHandler : AbstractHandler
+[PacketHandler(ServerHeader.ServerUserList)]
+public class UserListHandler : AbstractHandler
 {
-    //TODO: LiteDB에 저장
     internal override Task Handle(ChatClient session, InPacket inPacket)
     {
-        var response = inPacket.Decode<ServerMessageSync>();
-        response.Messages.ForEach(session.ViewModel.AddMessage);
+        var data = inPacket.Decode<ServerUserList>();
+        session.ViewModel.Users.AddRange(data.Users);
+
         return Task.CompletedTask;
     }
 }

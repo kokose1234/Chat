@@ -1,11 +1,15 @@
-﻿using System.Reactive;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reactive;
+using Chat.Client.Data;
 using Chat.Client.Models;
 using Chat.Client.Net;
 using Chat.Client.Tools;
-using Chat.Client.Views;
+using Chat.Common.Data;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
+using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -31,6 +35,15 @@ namespace Chat.Client.ViewModels
         public ReactiveCommand<Unit, Unit> RegisterCommand { get; }
 
         #endregion
+
+        #region Messages
+
+        public IObservableCollection<Channel> Channels { get; } = new ObservableCollectionExtended<Channel>();
+        public IObservableCollection<Message> Messages { get; } = new ObservableCollectionExtended<Message>();
+
+        #endregion
+
+        public List<UserInfo> Users { get; } = new();
 
         [Reactive]
         public string SearchTerm { get; set; } = string.Empty;
@@ -68,6 +81,21 @@ namespace Chat.Client.ViewModels
 
             packet.Encode(request);
             ChatClient.Instance.Send(packet);
+        }
+
+        public void AddMessage(Message message)
+        {
+            if (Channels.All(x => x.Id != message.ChannelId))
+            {
+                Channels.Add(new Channel
+                {
+                    Id = message.ChannelId,
+                    Name = Users.FirstOrDefault(x => x.Id == message.Sender)?.Name ?? "테스트",
+                    Description = message.Text
+                });
+            }
+
+            Messages.Add(message);
         }
     }
 }

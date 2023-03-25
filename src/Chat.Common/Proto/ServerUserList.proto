@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "Data/UserInfo.proto";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Server";
+
+message ServerUserList {
+	repeated UserInfo users = 1;
+}

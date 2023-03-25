@@ -108,23 +108,15 @@
                 </Grid>
                 <ScrollViewer Grid.Row="1" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Hidden" Margin="5">
-                    <StackPanel>
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                        <TextBox />
-                    </StackPanel>
+                    <!-- <StackPanel> -->
+                    <!-- </StackPanel> -->
+                    <ListBox Items="{Binding Channels}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ListBox>
                 </ScrollViewer>
             </Grid>
             <Grid Column="1">

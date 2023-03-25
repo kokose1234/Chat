@@ -11,7 +11,7 @@ def save_packet_header(names, packet_type):
 
     output_str = StringIO()
     output_str.write('namespace Chat.Common.Net.Packet.Header\n{\n    public enum !Header : uint\n    {\n        NullPacket = 0,'.replace('!', packet_type))
-    for name in filter(lambda x: x.startswith(packet_type), names):
+    for name in sorted(filter(lambda x: x.startswith(packet_type), names)):
         crc = binascii.crc32(name.encode('utf8'))
         output_str.write(f'\n        {name} = {crc},')
     output_str.write('\n    }\n}')

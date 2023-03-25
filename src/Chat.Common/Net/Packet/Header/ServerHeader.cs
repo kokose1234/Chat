@@ -6,7 +6,9 @@ namespace Chat.Common.Net.Packet.Header
         ServerAccountRegister = 3515379851,
         ServerHandshake = 23746173,
         ServerLogin = 1005611576,
+        ServerMessage = 1244765267,
         ServerMessageSync = 4059829408,
         ServerPing = 3105391283,
+        ServerUserList = 1889783576,
     }
 }

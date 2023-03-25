@@ -11,23 +11,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Proto\ClientMessage.proto" />
     <None Remove="Proto\ClientMessageSync.proto" />
     <None Remove="Proto\Data\Message.proto" />
+    <None Remove="Proto\Data\UserInfo.proto" />
+    <None Remove="Proto\ServerMessage.proto" />
     <None Remove="Proto\ServerMessageSync.proto" />
+    <None Remove="Proto\ServerUserList.proto" />
   </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="Proto\ClientAccountRegister.proto" />
     <AdditionalFiles Include="Proto\ClientEditProfile.proto" />
     <AdditionalFiles Include="Proto\ClientLogin.proto" />
+    <AdditionalFiles Include="Proto\ClientMessage.proto" />
     <AdditionalFiles Include="Proto\ClientMessageSync.proto" />
     <AdditionalFiles Include="Proto\ClientPong.proto" />
     <AdditionalFiles Include="Proto\Data\Message.proto" />
+    <AdditionalFiles Include="Proto\Data\UserInfo.proto" />
     <AdditionalFiles Include="Proto\ServerAccountRegister.proto" />
     <AdditionalFiles Include="Proto\ServerHandshake.proto" />
     <AdditionalFiles Include="Proto\ServerLogin.proto" />
+    <AdditionalFiles Include="Proto\ServerMessage.proto" />
     <AdditionalFiles Include="Proto\ServerMessageSync.proto" />
     <AdditionalFiles Include="Proto\ServerPing.proto" />
+    <AdditionalFiles Include="Proto\ServerUserList.proto" />
   </ItemGroup>
 
   <ItemGroup>

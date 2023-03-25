@@ -5,6 +5,6 @@ import "Data/Message.proto";
 option csharp_namespace = "Chat.Common.Packet.Data.Server";
 option optimize_for = CODE_SIZE;
 
-message ServerMessageSync {
-	repeated Message messages = 1;
+message ServerMessage {
+	Message message = 1;
 }
