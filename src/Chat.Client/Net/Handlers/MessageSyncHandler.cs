@@ -13,7 +13,13 @@ public class MessageSyncHandler : AbstractHandler
     internal override Task Handle(ChatClient session, InPacket inPacket)
     {
         var response = inPacket.Decode<ServerMessageSync>();
-        response.Messages.ForEach(session.ViewModel.AddMessage);
+
+        foreach (var message in response.Messages)
+        {
+            message.IsMyMessage = message.Sender == session.UserId;
+            session.ViewModel.AddMessage(message);
+        }
+
         return Task.CompletedTask;
     }
 }

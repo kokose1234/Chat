@@ -18,6 +18,7 @@ internal sealed class ChatClient : TcpClient
     internal static readonly Lazy<ChatClient> Lazy = new(() => new ChatClient("127.0.0.1", 9000));
     internal static ChatClient Instance => Lazy.Value;
 
+    public int UserId { get; set; }
     public MainWindowViewModel ViewModel { get; set; }
 
     private byte[] _sendKey = null!;

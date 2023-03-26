@@ -108,19 +108,31 @@
                 </Grid>
                 <ScrollViewer Grid.Row="1" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Hidden" Margin="5">
-                    <!-- <StackPanel> -->
-                    <!-- </StackPanel> -->
-                    <ListBox Items="{Binding Channels}">
-                        <ItemsControl.ItemTemplate>
+                    <ListBox Name="ChannelList" SelectedIndex="-1">
+                        <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}" />
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
+                        </ListBox.ItemTemplate>
                     </ListBox>
                 </ScrollViewer>
             </Grid>
-            <Grid Column="1">
-                <Label Content="대화할 방을 선택하세요." VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <Grid Column="1" RowDefinitions="35, *, 30">
+                <!-- <Label Content="대화할 방을 선택하세요." VerticalAlignment="Center" HorizontalAlignment="Center" /> -->
+                <Grid Background="#17212B">
+                </Grid>
+                <ScrollViewer Grid.Row="1">
+                    <StackPanel Background="#0E1621">
+                        <ItemsControl Items="{Binding CurrentMessages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Text}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+                <TextBox Grid.Row="2" BorderThickness="0" Background="#17212B"/>
             </Grid>
         </Grid>
     </StackPanel>

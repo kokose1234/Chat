@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Mixins;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -19,7 +20,13 @@ namespace Chat.Client.Views
 
         public MainWindow()
         {
-            this.WhenActivated(disposables => { });
+            this.WhenActivated(disposables =>
+            {
+                this.OneWayBind(ViewModel, vm => vm.Channels, v => v.ChannelList.Items)
+                    .DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedChannel, v => v.ChannelList.SelectedItem)
+                    .DisposeWith(disposables);
+            });
 
             InitializeComponent();
         }
