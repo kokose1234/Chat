@@ -106,11 +106,12 @@ namespace Chat.Client.ViewModels
                 Channels.Add(new Channel
                 {
                     Id = message.ChannelId,
-                    Name = Users.FirstOrDefault(x => x.Id == message.Sender)?.Name ?? "테스트",
+                    Name = Users.FirstOrDefault(x => x.Id == message.Sender)?.Name ?? "(null)",
                     Description = message.Text
                 });
             }
 
+            Channels.First(x => x.Id == message.ChannelId).Description = message.Text;
             Messages.Add(message);
         }
     }
