@@ -1,4 +1,4 @@
-﻿namespace Chat.Client.Data;
+﻿namespace Chat.Client.Models;
 
 public sealed record Channel
 {

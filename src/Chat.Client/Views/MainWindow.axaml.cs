@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
@@ -91,6 +92,24 @@ namespace Chat.Client.Views
         {
             var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/menu.png"));
             MenuImage.Source = new Bitmap(asset);
+        }
+
+        private void AttachButton_OnPointerEnter(object? sender, PointerEventArgs e)
+        {
+            var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/attach-hover.png"));
+            AttachImage.Source = new Bitmap(asset);
+        }
+
+        private void AttachButton_OnPointerLeave(object? sender, PointerEventArgs e)
+        {
+            var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/attach.png"));
+            AttachImage.Source = new Bitmap(asset);
+        }
+
+        private void AttachImage_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+            ViewModel?.AttachCommand.Execute().Subscribe();
         }
     }
 }

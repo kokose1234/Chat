@@ -5,6 +5,7 @@
         xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions.Custom"
         xmlns:v="using:Chat.Client.Views"
         xmlns:vm="using:Chat.Client.ViewModels"
+        xmlns:m="using:Chat.Client.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Width="800" Height="500"
@@ -19,7 +20,9 @@
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel IsLogined="True">
-     
+            <vm:MainWindowViewModel.SelectedChannel>
+                <m:Channel Name="Test" />
+            </vm:MainWindowViewModel.SelectedChannel>
         </vm:MainWindowViewModel>
     </Design.DataContext>
 
@@ -114,8 +117,8 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" />
-                                    <TextBlock Text="{Binding Description}" />
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#E9E9E9" />
+                                    <TextBlock Text="{Binding Description}" Foreground="#497EB5" />
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -123,22 +126,46 @@
                 </ScrollViewer>
             </Grid>
             <Grid Column="1" RowDefinitions="35, *, 30">
-                <Label Grid.Row="0" Grid.RowSpan="3" Content="대화할 방을 선택하세요." VerticalAlignment="Center" HorizontalAlignment="Center"
+                <Label Grid.Row="0" Grid.RowSpan="3" Content="대화할 방을 선택하세요." VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
                        IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNull}}" />
-                <Grid Grid.Row="0" Background="#17212B" IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <Grid Grid.Row="0" Background="#17212B" HorizontalAlignment="Left"
+                      IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <Grid IsVisible="{Binding IsPlayingMusic}">
+                        <Image Name="PlayButton" IsVisible="{Binding !IsMusicPaused}" Source="/Assets/Buttons/play.png" />
+                        <Image Name="PauseButton" IsVisible="{Binding IsMusicPaused}" Source="/Assets/Buttons/pause.png" />
+                    </Grid>
                 </Grid>
-                <ScrollViewer Grid.Row="1" IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ScrollViewer Grid.Row="1"
+                              IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
                     <StackPanel Background="#0E1621">
                         <ItemsControl Items="{Binding CurrentMessages}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Text}" />
+                                    <WrapPanel HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding SenderName}" />
+                                        <TextBlock Text=" : " />
+                                        <TextBlock Text="{Binding Message}" />
+                                    </WrapPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </StackPanel>
                 </ScrollViewer>
-                <TextBox Grid.Row="2" BorderThickness="0" Background="#17212B" IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <Grid Name="TextBoxGrid" Row="2" ColumnDefinitions="30, *"
+                      IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <Grid Name="AttachButton" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          PointerEnter="AttachButton_OnPointerEnter" PointerLeave="AttachButton_OnPointerLeave">
+                        <Image Name="AttachImage" Source="/Assets/Buttons/attach.png"
+                               PointerPressed="AttachImage_OnPointerPressed" />
+                    </Grid>
+                    <TextBox Grid.Column="1" Margin="3" BorderThickness="0" Background="#17212B"
+                             Text="{Binding ChatMessage}">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter" Command="{Binding SendMessageCommand}" />
+                        </TextBox.KeyBindings>
+                    </TextBox>
+                </Grid>
             </Grid>
         </Grid>
     </StackPanel>

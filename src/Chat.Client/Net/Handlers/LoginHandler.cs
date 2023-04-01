@@ -20,15 +20,6 @@ internal class LoginHandler : AbstractHandler
             case ServerLogin.LoginResult.Success:
             {
                 session.ViewModel.IsLogined = true;
-
-                using var packet = new OutPacket(ClientHeader.ClientMessageSync);
-                var request = new ClientMessageSync
-                {
-                    LastMessageId = 0 //TODO: use LiteDB
-                };
-
-                packet.Encode(request);
-                session.Send(packet);
                 break;
             }
             case ServerLogin.LoginResult.FailedDuplicateUser:

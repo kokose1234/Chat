@@ -1,4 +1,5 @@
-﻿using Chat.Server.Database;
+﻿using System.Net;
+using Chat.Server.Database;
 using Chat.Server.Net;
 
 namespace Chat.Server;
@@ -9,7 +10,7 @@ internal static class Program
     {
         Console.Title = $"Chat Server - {Constants.Version}";
 
-        var server = new ChatServer("127.0.0.1", 9000);
+        var server = new ChatServer(IPAddress.Any, 9000);
         PacketHandlers.RegisterPackets();
         DatabaseManager.Setup();
         server.Start();

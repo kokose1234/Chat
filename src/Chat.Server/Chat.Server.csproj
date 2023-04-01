@@ -5,7 +5,7 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <BaseOutputPath>../../Output/</BaseOutputPath>
+    <BaseOutputPath>../../Output</BaseOutputPath>
     <ApplicationIcon>logo.ico</ApplicationIcon>
     <StartupObject>Chat.Server.Program</StartupObject>
     <DefaultItemExcludes>$(DefaultItemExcludes);**\obj\*</DefaultItemExcludes>

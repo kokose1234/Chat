@@ -8,11 +8,9 @@ using Chat.Client.Net;
 using Chat.Client.Tools;
 using Chat.Client.ViewModels;
 using Chat.Client.Views;
-using Chat.Common.Data;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
-using Chat.Common.Packet.Data.Server;
 
 namespace Chat.Client
 {
@@ -37,7 +35,7 @@ namespace Chat.Client
             {
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(),
+                    DataContext = new MainWindowViewModel(desktop.MainWindow),
                 };
             }
 

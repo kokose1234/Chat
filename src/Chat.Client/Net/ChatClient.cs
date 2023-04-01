@@ -2,11 +2,13 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using Chat.Client.ViewModels;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
+using Chat.Common.Tools;
 using FastEnumUtility;
 using NetCoreServer;
 using Nito.AsyncEx;
@@ -15,7 +17,7 @@ namespace Chat.Client.Net;
 
 internal sealed class ChatClient : TcpClient
 {
-    internal static readonly Lazy<ChatClient> Lazy = new(() => new ChatClient("127.0.0.1", 9000));
+    internal static readonly Lazy<ChatClient> Lazy = new(() => new ChatClient("118.43.148.149", 9000));
     internal static ChatClient Instance => Lazy.Value;
 
     public int UserId { get; set; }
@@ -31,6 +33,7 @@ internal sealed class ChatClient : TcpClient
 
     private readonly AsyncLock _lock = new();
     private readonly AsyncConditionVariable _recvCondition;
+
 
     internal ChatClient(string address, int port) : base(address, port)
     {
@@ -64,51 +67,60 @@ internal sealed class ChatClient : TcpClient
 
     protected override void OnReceived(byte[] buffer, long offset, long size)
     {
-        if (size < 4)
+        try
         {
-            Console.WriteLine("패킷 사이즈가 너무 작음.");
-            return;
+            Array.Resize(ref buffer, (int) size);
+
+            if (size < 4)
+            {
+                Console.WriteLine("패킷 사이즈가 너무 작음.");
+                return;
+            }
+
+            var span = new ReadOnlySpan<byte>(buffer, (int) offset, (int) size);
+            for (var index = 0; index < size;)
+            {
+                if (_incompletePackets.Count == 0)
+                {
+                    var packetSize = BitConverter.ToInt32(span.Slice(index, 4)) + 4;
+                    if (packetSize > size - index)
+                    {
+                        _lastPacketSize = (uint) packetSize;
+                        _incompletePackets.Add(new(buffer, (int) offset + index, (int) size - index));
+                        return;
+                    }
+
+                    _rawRecvQueue.Enqueue(new ArraySegment<byte>(buffer, (int) offset + index, packetSize));
+                    _recvCondition.Notify();
+                    index += packetSize;
+                }
+                else
+                {
+                    var totalReceivedBytes = _incompletePackets.Sum(x => x.Count);
+                    var remainingBytes = _lastPacketSize - totalReceivedBytes;
+
+                    if (remainingBytes > size - index)
+                    {
+                        _incompletePackets.Add(new(buffer, (int) offset + index, (int) size - index));
+                        return;
+                    }
+
+                    _incompletePackets.Add(new(buffer, (int) offset + index, (int) remainingBytes));
+
+                    var data = _incompletePackets
+                               .SelectMany(segment => segment.Array[segment.Offset..(segment.Offset + segment.Count)])
+                               .ToArray();
+
+                    _rawRecvQueue.Enqueue(new(data));
+                    _recvCondition.Notify();
+                    _incompletePackets.Clear();
+                    index += (int) remainingBytes;
+                }
+            }
         }
-
-        var span = new ReadOnlySpan<byte>(buffer, (int) offset, (int) size);
-        for (var index = 0; index < size;)
+        catch (Exception e)
         {
-            if (_incompletePackets.Count == 0)
-            {
-                var packetSize = BitConverter.ToInt32(span.Slice(index, 4)) + 4;
-                if (packetSize > size - index)
-                {
-                    _lastPacketSize = (uint) packetSize;
-                    _incompletePackets.Add(new(buffer, (int) offset + index, (int) size - index));
-                    return;
-                }
-
-                _rawRecvQueue.Enqueue(new ArraySegment<byte>(buffer, (int) offset + index, packetSize + 4));
-                _recvCondition.Notify();
-                index += packetSize + 4;
-            }
-            else
-            {
-                var totalReceivedBytes = _incompletePackets.Sum(x => x.Count);
-                var remainingBytes = _lastPacketSize - totalReceivedBytes;
-
-                if (remainingBytes > size - index)
-                {
-                    _incompletePackets.Add(new(buffer, (int) offset + index, (int) size - index));
-                    return;
-                }
-
-                _incompletePackets.Add(new(buffer, (int) offset + index, (int) remainingBytes));
-
-                var data = _incompletePackets
-                           .SelectMany(segment => segment.Array[segment.Offset..(segment.Offset + segment.Count)])
-                           .ToArray();
-
-                _rawRecvQueue.Enqueue(new(data));
-                _recvCondition.Notify();
-                _incompletePackets.Clear();
-                index += (int) remainingBytes;
-            }
+            Console.WriteLine(e);
         }
     }
 
@@ -132,6 +144,9 @@ internal sealed class ChatClient : TcpClient
 
     private byte[] Encrypt(byte[] buffer)
     {
+#if DEBUG
+        return buffer;
+#endif
         var result = new byte[buffer.Length];
 
         for (var i = 0; i < buffer.Length; i++)
@@ -144,6 +159,9 @@ internal sealed class ChatClient : TcpClient
 
     private byte[] Decrypt(byte[] buffer)
     {
+#if DEBUG
+        return buffer;
+#endif
         var result = new byte[buffer.Length];
 
         for (var i = 0; i < buffer.Length; i++)

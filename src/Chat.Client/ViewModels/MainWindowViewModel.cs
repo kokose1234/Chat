@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive;
-using Chat.Client.Data;
+using System.Threading;
+using Avalonia.Controls;
 using Chat.Client.Models;
 using Chat.Client.Net;
 using Chat.Client.Tools;
@@ -12,8 +14,11 @@ using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
 using DynamicData;
 using DynamicData.Binding;
+using NAudio.Wave;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Message = Chat.Common.Data.Message;
+using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
 namespace Chat.Client.ViewModels
 {
@@ -41,11 +46,26 @@ namespace Chat.Client.ViewModels
         #region Messages
 
         public IObservableCollection<Channel> Channels { get; } = new ObservableCollectionExtended<Channel>();
-        public IObservableCollection<Message> Messages { get; } = new ObservableCollectionExtended<Message>();
-        public IObservableCollection<Message> CurrentMessages { get; } = new ObservableCollectionExtended<Message>();
+        public IObservableCollection<ChatMessage> Messages { get; } = new ObservableCollectionExtended<ChatMessage>();
+        public IObservableCollection<ChatMessage> CurrentMessages { get; } = new ObservableCollectionExtended<ChatMessage>();
 
         [Reactive]
         public Channel? SelectedChannel { get; set; }
+
+        [Reactive]
+        public string ChatMessage { get; set; } = string.Empty;
+
+        [Reactive]
+        public bool IsPlayingMusic { get; set; }
+
+        [Reactive]
+        public bool IsMusicPaused { get; set; }
+
+        public Thread? MusicThread { get; set; }
+
+
+        public ReactiveCommand<Unit, Unit> SendMessageCommand { get; }
+        public ReactiveCommand<Unit, Unit> AttachCommand { get; }
 
         #endregion
 
@@ -54,11 +74,18 @@ namespace Chat.Client.ViewModels
         [Reactive]
         public string SearchTerm { get; set; } = string.Empty;
 
-        public MainWindowViewModel()
+        private Window _window;
+
+        public MainWindowViewModel() { }
+
+        public MainWindowViewModel(Window window)
         {
+            _window = window;
             ChatClient.Instance.ViewModel = this;
             LoginCommand = ReactiveCommand.Create(Login);
             RegisterCommand = ReactiveCommand.Create(Register);
+            SendMessageCommand = ReactiveCommand.Create(SendMessage);
+            AttachCommand = ReactiveCommand.Create(Attach);
 
             this.WhenAnyValue(x => x.SelectedChannel)
                 .Subscribe(channel =>
@@ -101,18 +128,98 @@ namespace Chat.Client.ViewModels
 
         public void AddMessage(Message message)
         {
-            if (Channels.All(x => x.Id != message.ChannelId))
+            var msg = new ChatMessage
             {
-                Channels.Add(new Channel
+                // Id = message.Id,
+                ChannelId = message.ChannelId,
+                SenderId = message.Sender,
+                Message = message.Text,
+                Time = message.Date ?? DateTime.Now
+            };
+            Channels.First(x => x.Id == message.ChannelId).Description = message.Text;
+            msg.SenderName = Users.First(x => x.Id == message.Sender).Name;
+
+            Messages.Add(msg);
+
+            if (SelectedChannel != null && SelectedChannel.Id == message.ChannelId)
+            {
+                CurrentMessages.Add(msg);
+            }
+        }
+
+        public void PlayMusic(byte[] data)
+        {
+            try
+            {
+                IsPlayingMusic = true;
+                IsMusicPaused = false;
+
+                using var ms = new MemoryStream(data);
+                using var rdr = new Mp3FileReader(ms);
+                using var wavStream = WaveFormatConversionStream.CreatePcmStream(rdr);
+                using var baStream = new BlockAlignReductionStream(wavStream);
+                using var waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
+
+                waveOut.Volume = 0.5f;
+                waveOut.Init(baStream);
+                waveOut.Play();
+
+                while (waveOut.PlaybackState == PlaybackState.Playing)
                 {
-                    Id = message.ChannelId,
-                    Name = Users.FirstOrDefault(x => x.Id == message.Sender)?.Name ?? "(null)",
-                    Description = message.Text
-                });
+                    Thread.Sleep(10);
+                }
+            }
+            catch (ThreadInterruptedException)
+            {
+                // TODO: Log
+            }
+            finally
+            {
+                IsPlayingMusic = false;
+                IsMusicPaused = false;
+            }
+        }
+
+        private void SendMessage()
+        {
+            if (!string.IsNullOrWhiteSpace(ChatMessage))
+            {
+                using var packet = new OutPacket(ClientHeader.ClientMessage);
+                var request = new ClientMessage
+                {
+                    Message = ChatMessage,
+                    IsEncrypted = false
+                };
+                packet.Encode(request);
+                ChatClient.Instance.Send(packet);
             }
 
-            Channels.First(x => x.Id == message.ChannelId).Description = message.Text;
-            Messages.Add(message);
+            ChatMessage = string.Empty;
+        }
+
+        private void Attach()
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Filter = "MP3 파일 (*.mp3)|*.mp3",
+                Multiselect = false
+            };
+            if (ofd.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+            var file = File.ReadAllBytes(ofd.FileName);
+            var data = new byte[file.Length + 1];
+            using var packet = new OutPacket(ClientHeader.ClientMessage);
+
+            data[0] = 1; //TODO: Enum
+            Buffer.BlockCopy(file, 0, data, 1, file.Length);
+            var request = new ClientMessage
+            {
+                Message = Path.GetFileName(ofd.FileName),
+                Attachment = data,
+                IsEncrypted = false
+            };
+            packet.Encode(request);
+            ChatClient.Instance.Send(packet);
         }
     }
 }

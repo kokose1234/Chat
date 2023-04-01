@@ -14,22 +14,22 @@ internal class ChatClient
     public string Username { get; set; }
     public string Name { get; set; }
     public bool IsAdmin { get; set; }
+    public ChatSession Session { get; }
 
     private readonly Timer _pingTimer;
-    private readonly ChatSession _session;
 
     internal ChatClient(ChatSession session)
     {
         _pingTimer = new Timer(OnPingTimer);
         _pingTimer.Change(TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(1));
-        _session = session;
+        Session = session;
     }
 
     private void OnPingTimer(object? state)
     {
         if (DateTimeOffset.Now.ToUnixTimeMilliseconds() - LastPongTime > 120000)
         {
-            _session.Close();
+            Session.Close();
             return;
         }
 
@@ -38,7 +38,7 @@ internal class ChatClient
         LastPingKey = ping.Key;
 
         packet.Encode(ping);
-        _session.Send(packet);
+        Session.Send(packet);
 
         Console.WriteLine($"[S] Ping: {ping.Key}");
     }

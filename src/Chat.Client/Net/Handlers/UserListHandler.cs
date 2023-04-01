@@ -2,6 +2,7 @@
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
+using Chat.Common.Packet.Data.Client;
 using Chat.Common.Packet.Data.Server;
 
 namespace Chat.Client.Net.Handlers;
@@ -13,6 +14,15 @@ public class UserListHandler : AbstractHandler
     {
         var data = inPacket.Decode<ServerUserList>();
         session.ViewModel.Users.AddRange(data.Users);
+        
+        using var packet = new OutPacket(ClientHeader.ClientMessageSync);
+        var request = new ClientMessageSync
+        {
+            LastMessageId = 0 //TODO: use LiteDB
+        };
+        
+        packet.Encode(request);
+        session.Send(packet);
 
         return Task.CompletedTask;
     }

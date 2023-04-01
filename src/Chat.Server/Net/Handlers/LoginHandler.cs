@@ -59,7 +59,7 @@ public class LoginHandler : AbstractHandler
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
             using var packet = new OutPacket(ServerHeader.ServerUserList);
-            var users = (await DatabaseManager.Factory.Query("accounts").WhereNot("username", request.UserName).GetAsync()).ToImmutableArray();
+            var users = (await DatabaseManager.Factory.Query("accounts").GetAsync()).ToImmutableArray();
             var userList = new ServerUserList();
 
             userList.Users.AddRange(users.Select(user => new UserInfo
@@ -69,6 +69,23 @@ public class LoginHandler : AbstractHandler
             }));
 
             packet.Encode(userList);
+            session.Send(packet);
+        }
+
+        using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
+        {
+            using var packet = new OutPacket(ServerHeader.ServerChannelSync);
+            var channelIds = (await DatabaseManager.Factory.Query("channel_users").Select("channel_id").Where("user_id", session.Client.Id).Distinct().GetAsync<int>()).ToArray();
+            var channels = (await DatabaseManager.Factory.Query("channels").WhereIn("id", channelIds).GetAsync()).ToImmutableArray();
+            var data = new ServerChannelSync();
+
+            data.Channels.AddRange(channels.Select(channel => new ChannelInfo
+            {
+                Id = channel.id,
+                Name = channel.name,
+            }));
+
+            packet.Encode(data);
             session.Send(packet);
         }
     }

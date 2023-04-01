@@ -10,7 +10,6 @@ using Nito.AsyncEx;
 
 namespace Chat.Server.Net;
 
-//TODO: 리시브, 샌드 스레드 분리
 internal class ChatSession : TcpSession
 {
     internal ChatClient Client { get; private set; } = null!;
@@ -62,6 +61,8 @@ internal class ChatSession : TcpSession
 
     protected override void OnReceived(byte[] buffer, long offset, long size)
     {
+        Array.Resize(ref buffer, (int)size);
+
         if (size < 4)
         {
             Console.WriteLine("패킷 사이즈가 너무 작음.");
@@ -81,9 +82,9 @@ internal class ChatSession : TcpSession
                     return;
                 }
 
-                _rawRecvQueue.Enqueue(new ArraySegment<byte>(buffer, (int) offset + index, packetSize + 4));
+                _rawRecvQueue.Enqueue(new ArraySegment<byte>(buffer, (int) offset + index, packetSize));
                 _recvCondition.Notify();
-                index += packetSize + 4;
+                index += packetSize;
             }
             else
             {
@@ -137,6 +138,9 @@ internal class ChatSession : TcpSession
 
     private byte[] Encrypt(byte[] buffer)
     {
+#if DEBUG
+        return buffer;
+#endif
         var result = new byte[buffer.Length];
 
         for (var i = 0; i < buffer.Length; i++)
@@ -149,6 +153,9 @@ internal class ChatSession : TcpSession
 
     private byte[] Decrypt(byte[] buffer)
     {
+#if DEBUG
+        return buffer;
+#endif
         var result = new byte[buffer.Length];
 
         for (var i = 0; i < buffer.Length; i++)
