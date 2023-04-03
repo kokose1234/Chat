@@ -6,6 +6,7 @@
         xmlns:v="using:Chat.Client.Views"
         xmlns:vm="using:Chat.Client.ViewModels"
         xmlns:m="using:Chat.Client.Models"
+        xmlns:conv="using:Chat.Client.Data.Converters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Width="800" Height="500"
@@ -25,6 +26,10 @@
             </vm:MainWindowViewModel.SelectedChannel>
         </vm:MainWindowViewModel>
     </Design.DataContext>
+
+    <Window.Resources>
+        <conv:TimeConverter x:Key="timeConverter" />
+    </Window.Resources>
 
     <Window.Styles>
         <Style Selector="Image.TopBarButton">
@@ -61,6 +66,7 @@
             <ia:ChangePropertyAction TargetObject="LoginMessage" PropertyName="Foreground" Value="Green" />
         </ia:DataTriggerBehavior>
     </i:Interaction.Behaviors>
+
     <StackPanel Width="800">
         <Grid Name="TopBar" Background="#242F3D" Height="25" PointerPressed="TopBar_OnPointerPressed">
             <Grid HorizontalAlignment="Right" ColumnDefinitions="25, 25">
@@ -129,12 +135,27 @@
                 <Label Grid.Row="0" Grid.RowSpan="3" Content="대화할 방을 선택하세요." VerticalAlignment="Center"
                        HorizontalAlignment="Center"
                        IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNull}}" />
-                <Grid Grid.Row="0" Background="#17212B" HorizontalAlignment="Left"
+                <Grid Grid.Row="0" Background="#17212B" HorizontalAlignment="Stretch"
                       IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
-                    <Grid IsVisible="{Binding IsPlayingMusic}">
-                        <Image Name="PlayButton" IsVisible="{Binding !IsMusicPaused}" Source="/Assets/Buttons/play.png" />
-                        <Image Name="PauseButton" IsVisible="{Binding IsMusicPaused}" Source="/Assets/Buttons/pause.png" />
-                    </Grid>
+                    <WrapPanel IsVisible="{Binding IsPlayingMusic}" HorizontalAlignment="Left"
+                               VerticalAlignment="Top">
+                        <Grid>
+                            <Image Name="PlayButton" IsVisible="{Binding IsMusicPaused}"
+                                   Source="/Assets/Buttons/play.png" PointerPressed="PlayButton_OnPointerPressed" />
+                            <Image Name="PauseButton" IsVisible="{Binding !IsMusicPaused}"
+                                   Source="/Assets/Buttons/pause.png" PointerPressed="PauseButton_OnPointerPressed" />
+                        </Grid>
+                        <Slider Name="PositionSlider" Maximum="{Binding MusicLength}" Value="{Binding MusicPosition}"
+                                Width="330"
+                                VerticalAlignment="Center" Margin="10,0" Padding="0,0,0,20" />
+                        <Label Content="{Binding MusicPosition, Converter={StaticResource timeConverter}}"
+                               VerticalContentAlignment="Center" FontFamily="나눔고딕" />
+                        <Label Content="/" VerticalContentAlignment="Center" FontFamily="나눔고딕" />
+                        <Label Content="{Binding MusicLength, Converter={StaticResource timeConverter}}"
+                               VerticalContentAlignment="Center" FontFamily="나눔고딕" />
+                        <Slider Name="VolumeSlider" Maximum="100" Value="{Binding MusicVolume}" Width="100"
+                                VerticalAlignment="Center" Margin="10,0" Padding="0,0,0,20" />
+                    </WrapPanel>
                 </Grid>
                 <ScrollViewer Grid.Row="1"
                               IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">

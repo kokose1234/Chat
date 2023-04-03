@@ -2,13 +2,11 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using Chat.Client.ViewModels;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
-using Chat.Common.Tools;
 using FastEnumUtility;
 using NetCoreServer;
 using Nito.AsyncEx;
@@ -17,7 +15,7 @@ namespace Chat.Client.Net;
 
 internal sealed class ChatClient : TcpClient
 {
-    internal static readonly Lazy<ChatClient> Lazy = new(() => new ChatClient("118.43.148.149", 9000));
+    internal static readonly Lazy<ChatClient> Lazy = new(() => new ChatClient("127.0.0.1", 9000));
     internal static ChatClient Instance => Lazy.Value;
 
     public int UserId { get; set; }

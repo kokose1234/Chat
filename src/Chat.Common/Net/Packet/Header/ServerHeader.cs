@@ -10,6 +10,7 @@ namespace Chat.Common.Net.Packet.Header
         ServerMessage = 1244765267,
         ServerMessageSync = 4059829408,
         ServerPing = 3105391283,
+        ServerSyncMusic = 3845237243,
         ServerUserList = 1889783576,
     }
 }

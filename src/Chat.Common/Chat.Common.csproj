@@ -13,12 +13,14 @@
   <ItemGroup>
     <None Remove="Proto\ClientMessage.proto" />
     <None Remove="Proto\ClientMessageSync.proto" />
+    <None Remove="Proto\ClientSyncMusic.proto" />
     <None Remove="Proto\Data\ChannelInfo.proto" />
     <None Remove="Proto\Data\Message.proto" />
     <None Remove="Proto\Data\UserInfo.proto" />
     <None Remove="Proto\ServerChannelSync.proto" />
     <None Remove="Proto\ServerMessage.proto" />
     <None Remove="Proto\ServerMessageSync.proto" />
+    <None Remove="Proto\ServerSyncMusic.proto" />
     <None Remove="Proto\ServerUserList.proto" />
   </ItemGroup>
 
@@ -29,6 +31,7 @@
     <AdditionalFiles Include="Proto\ClientMessage.proto" />
     <AdditionalFiles Include="Proto\ClientMessageSync.proto" />
     <AdditionalFiles Include="Proto\ClientPong.proto" />
+    <AdditionalFiles Include="Proto\ServerSyncMusic.proto" />
     <AdditionalFiles Include="Proto\Data\Message.proto" />
     <AdditionalFiles Include="Proto\Data\ChannelInfo.proto" />
     <AdditionalFiles Include="Proto\Data\UserInfo.proto" />
@@ -38,6 +41,7 @@
     <AdditionalFiles Include="Proto\ServerMessage.proto" />
     <AdditionalFiles Include="Proto\ServerChannelSync.proto" />
     <AdditionalFiles Include="Proto\ServerMessageSync.proto" />
+    <AdditionalFiles Include="Proto\ClientSyncMusic.proto" />
     <AdditionalFiles Include="Proto\ServerPing.proto" />
     <AdditionalFiles Include="Proto\ServerUserList.proto" />
   </ItemGroup>

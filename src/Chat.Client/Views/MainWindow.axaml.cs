@@ -1,6 +1,6 @@
 using System;
-using System.Reactive;
 using System.Reflection;
+using System.Windows.Forms;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Mixins;
@@ -110,6 +110,20 @@ namespace Chat.Client.Views
         {
             if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
             ViewModel?.AttachCommand.Execute().Subscribe();
+        }
+
+        private void PlayButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+            ViewModel?.ResumeCommand.Execute().Subscribe();
+            ViewModel?.SendResumeMusicPacket();
+        }
+
+        private void PauseButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+            ViewModel?.PauseCommand.Execute().Subscribe();
+            ViewModel?.SendPauseMusicPacket();
         }
     }
 }

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reactive;
 using System.Threading;
 using Avalonia.Controls;
+using Chat.Client.Data;
+using Chat.Client.Data.Types;
 using Chat.Client.Models;
 using Chat.Client.Net;
 using Chat.Client.Tools;
@@ -14,7 +16,6 @@ using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
 using DynamicData;
 using DynamicData.Binding;
-using NAudio.Wave;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Message = Chat.Common.Data.Message;
@@ -55,17 +56,73 @@ namespace Chat.Client.ViewModels
         [Reactive]
         public string ChatMessage { get; set; } = string.Empty;
 
+
+        public ReactiveCommand<Unit, Unit> SendMessageCommand { get; }
+        public ReactiveCommand<Unit, Unit> AttachCommand { get; }
+
+        #endregion
+
+        #region Music
+
         [Reactive]
         public bool IsPlayingMusic { get; set; }
 
         [Reactive]
         public bool IsMusicPaused { get; set; }
 
-        public Thread? MusicThread { get; set; }
+        [Reactive]
+        public int MusicLength { get; private set; }
 
+        private int _musicPosition;
 
-        public ReactiveCommand<Unit, Unit> SendMessageCommand { get; }
-        public ReactiveCommand<Unit, Unit> AttachCommand { get; }
+        public int MusicPosition
+        {
+            get => _player?.Position ?? 0;
+            set
+            {
+                if (_player == null) return;
+
+                if (value < 0)
+                {
+                    var time = Math.Abs(value);
+
+                    _player.Position = time;
+                    this.RaiseAndSetIfChanged(ref _musicPosition, time);
+                }
+                else
+                {
+                    if (_player.Position == value)
+                    {
+                        this.RaiseAndSetIfChanged(ref _musicPosition, value);
+                        return;
+                    }
+
+                    _player.Position = value;
+                    WarpMusic(value);
+                    this.RaiseAndSetIfChanged(ref _musicPosition, value);
+                }
+            }
+        }
+
+        private int _musicVolume;
+
+        public byte MusicVolume
+        {
+            get => _player != null ? (byte) (_player.Volume * 100) : (byte) 75;
+            set
+            {
+                if (_player != null)
+                {
+                    _player.Volume = value / 100f;
+                    this.RaiseAndSetIfChanged(ref _musicVolume, value);
+                }
+            }
+        }
+
+        public ReactiveCommand<Unit, Unit> ResumeCommand { get; }
+        public ReactiveCommand<Unit, Unit> PauseCommand { get; }
+
+        private Timer _musicTimer;
 
         #endregion
 
@@ -75,6 +132,7 @@ namespace Chat.Client.ViewModels
         public string SearchTerm { get; set; } = string.Empty;
 
         private Window _window;
+        private SoundPlayer? _player;
 
         public MainWindowViewModel() { }
 
@@ -86,6 +144,16 @@ namespace Chat.Client.ViewModels
             RegisterCommand = ReactiveCommand.Create(Register);
             SendMessageCommand = ReactiveCommand.Create(SendMessage);
             AttachCommand = ReactiveCommand.Create(Attach);
+            ResumeCommand = ReactiveCommand.Create(ResumeMusic);
+            PauseCommand = ReactiveCommand.Create(PauseMusic);
+
+            _musicTimer = new Timer(state =>
+            {
+                if (_player is {Disposed: false})
+                {
+                    MusicPosition = _player.Position;
+                }
+            }, null, 0, 100);
 
             this.WhenAnyValue(x => x.SelectedChannel)
                 .Subscribe(channel =>
@@ -149,34 +217,24 @@ namespace Chat.Client.ViewModels
 
         public void PlayMusic(byte[] data)
         {
+            if (_player is {Disposed: false})
+            {
+                _player.Stop();
+                _player.Dispose();
+                _player = null;
+            }
+
             try
             {
+                _player = new SoundPlayer(data, this);
+                _player.Play();
                 IsPlayingMusic = true;
                 IsMusicPaused = false;
-
-                using var ms = new MemoryStream(data);
-                using var rdr = new Mp3FileReader(ms);
-                using var wavStream = WaveFormatConversionStream.CreatePcmStream(rdr);
-                using var baStream = new BlockAlignReductionStream(wavStream);
-                using var waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
-
-                waveOut.Volume = 0.5f;
-                waveOut.Init(baStream);
-                waveOut.Play();
-
-                while (waveOut.PlaybackState == PlaybackState.Playing)
-                {
-                    Thread.Sleep(10);
-                }
+                MusicLength = _player.Length;
             }
-            catch (ThreadInterruptedException)
+            catch (Exception)
             {
-                // TODO: Log
-            }
-            finally
-            {
-                IsPlayingMusic = false;
-                IsMusicPaused = false;
+                _player?.Dispose();
             }
         }
 
@@ -210,7 +268,7 @@ namespace Chat.Client.ViewModels
             var data = new byte[file.Length + 1];
             using var packet = new OutPacket(ClientHeader.ClientMessage);
 
-            data[0] = 1; //TODO: Enum
+            data[0] = (byte) AttachmentType.Music;
             Buffer.BlockCopy(file, 0, data, 1, file.Length);
             var request = new ClientMessage
             {
@@ -218,6 +276,52 @@ namespace Chat.Client.ViewModels
                 Attachment = data,
                 IsEncrypted = false
             };
+            packet.Encode(request);
+            ChatClient.Instance.Send(packet);
+        }
+
+        public void ResumeMusic()
+        {
+            _player?.Play();
+            IsMusicPaused = false;
+        }
+
+        public void PauseMusic()
+        {
+            _player?.Pause();
+            IsMusicPaused = true;
+        }
+
+        private void WarpMusic(int position)
+        {
+            if (SelectedChannel != null)
+            {
+                using var packet = new OutPacket(ClientHeader.ClientSyncMusic);
+                var request = new ClientSyncMusic {Channel = SelectedChannel.Id, Data = position};
+
+                packet.Encode(request);
+                ChatClient.Instance.Send(packet);
+            }
+        }
+
+        public void SendResumeMusicPacket()
+        {
+            if (SelectedChannel == null) return;
+
+            using var packet = new OutPacket(ClientHeader.ClientSyncMusic);
+            var request = new ClientSyncMusic {Channel = SelectedChannel.Id, Data = int.MinValue + 1};
+
+            packet.Encode(request);
+            ChatClient.Instance.Send(packet);
+        }
+
+        public void SendPauseMusicPacket()
+        {
+            if (SelectedChannel == null) return;
+
+            using var packet = new OutPacket(ClientHeader.ClientSyncMusic);
+            var request = new ClientSyncMusic {Channel = SelectedChannel.Id, Data = int.MinValue + 2};
+
             packet.Encode(request);
             ChatClient.Instance.Send(packet);
         }

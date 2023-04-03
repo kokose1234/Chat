@@ -27,9 +27,7 @@ public class MessageHandler : AbstractHandler
             case 1: // mp3
                 data.Message.Text = $"{data.Message.Text} 재생";
                 session.ViewModel.AddMessage(data.Message);
-                session.ViewModel.MusicThread?.Interrupt();
-                session.ViewModel.MusicThread = new Thread(() => session.ViewModel.PlayMusic(fileData));
-                session.ViewModel.MusicThread.Start();
+                session.ViewModel.PlayMusic(fileData);
                 break;
         }
 

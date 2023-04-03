@@ -9,5 +9,6 @@ namespace Chat.Common.Net.Packet.Header
         ClientMessage = 1726737958,
         ClientMessageSync = 3009919302,
         ClientPong = 2767742975,
+        ClientSyncMusic = 158472322,
     }
 }
