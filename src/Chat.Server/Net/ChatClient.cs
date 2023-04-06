@@ -2,10 +2,11 @@
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
 using Chat.Common.Tools;
+using Chat.Server.Data;
 
 namespace Chat.Server.Net;
 
-internal class ChatClient
+public class ChatClient: ISavableObject
 {
     public long LastPongTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
     public int LastPingKey { get; set; }
@@ -41,5 +42,10 @@ internal class ChatClient
         Session.Send(packet);
 
         Console.WriteLine($"[S] Ping: {ping.Key}");
+    }
+
+    public void Save()
+    {
+        throw new NotImplementedException();
     }
 }

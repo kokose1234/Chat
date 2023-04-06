@@ -12,6 +12,4 @@ message Message {
   google.protobuf.Timestamp date = 4;
   string text = 5;
   bytes attachment = 6;
-  bool encrypted = 7;
-  optional bool is_my_message = 8;
 }

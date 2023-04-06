@@ -16,7 +16,6 @@ public class MessageSyncHandler : AbstractHandler
 
         foreach (var message in response.Messages)
         {
-            message.IsMyMessage = message.Sender == session.UserId;
             session.ViewModel.AddMessage(message);
         }
 

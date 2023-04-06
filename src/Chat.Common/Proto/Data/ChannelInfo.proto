@@ -5,4 +5,5 @@ option csharp_namespace = "Chat.Common.Data";
 message ChannelInfo {
 	uint32 id = 1;
 	string name = 2;
+	bool is_secret = 3;
 }

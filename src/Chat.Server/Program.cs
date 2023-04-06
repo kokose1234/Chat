@@ -12,7 +12,6 @@ internal static class Program
 
         var server = new ChatServer(IPAddress.Any, 9000);
         PacketHandlers.RegisterPackets();
-        DatabaseManager.Setup();
         server.Start();
 
         // var data = File.ReadAllBytes("./test.png");
@@ -29,6 +28,7 @@ internal static class Program
         //         is_encrypted = 0
         //     });
         // }
+
 
         while (true)
         {

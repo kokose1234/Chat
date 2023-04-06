@@ -45,14 +45,16 @@ public class LoginHandler : AbstractHandler
                 IsAdmin = account[0].admin == 1,
             });
 
-            if (!ChatServer.Clients.ContainsKey(session.Id.ToString())) return;
-            var client = ChatServer.Clients[session.Id.ToString()];
+            if (!ChatServer.Instance.Clients.ContainsKey(session.Id.ToString())) return;
+            var client = ChatServer.Instance.Clients[session.Id.ToString()];
             client.Id = account[0].id;
             client.Username = account[0].username;
             client.Name = account[0].name;
             client.IsAdmin = account[0].admin == 1;
 
             session.Send(packet);
+            
+            ChatServer.Instance.AddClientToChannel(client);
         }
 
         //TODO: 친구, 같은 대화방 사람만 보내기
@@ -72,6 +74,7 @@ public class LoginHandler : AbstractHandler
             session.Send(packet);
         }
 
+        //TODO: From ChatServer
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
             using var packet = new OutPacket(ServerHeader.ServerChannelSync);
@@ -83,6 +86,7 @@ public class LoginHandler : AbstractHandler
             {
                 Id = channel.id,
                 Name = channel.name,
+                IsSecret = false
             }));
 
             packet.Encode(data);

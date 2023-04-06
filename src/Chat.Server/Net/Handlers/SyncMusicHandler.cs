@@ -14,7 +14,7 @@ public class SyncMusicHandler : AbstractHandler
         var data = inPacket.Decode<ClientSyncMusic>();
 
         //TODO: 채팅방 참가자만 보내기
-        foreach (var kvp in ChatServer.Clients)
+        foreach (var kvp in ChatServer.Instance.Clients)
         {
             if (kvp.Value == session.Client) continue;
 

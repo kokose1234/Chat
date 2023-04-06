@@ -35,7 +35,6 @@ public class MessageSyncHandler : AbstractHandler
                 Date = x.date,
                 Text = x.message,
                 Attachment = (byte[]) x.attachment,
-                Encrypted = x.encrypted == 1
             });
 
             response.Messages.AddRange(messages);

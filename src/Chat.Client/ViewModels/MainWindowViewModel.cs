@@ -16,6 +16,7 @@ using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
 using DynamicData;
 using DynamicData.Binding;
+using LibVLCSharp.Shared;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Message = Chat.Common.Data.Message;
@@ -126,6 +127,14 @@ namespace Chat.Client.ViewModels
 
         #endregion
 
+        #region Video
+
+        public MediaPlayer MediaPlayer { get; }
+
+        private readonly LibVLC _libVlc = new();
+
+        #endregion
+
         public List<UserInfo> Users { get; } = new();
 
         [Reactive]
@@ -146,6 +155,8 @@ namespace Chat.Client.ViewModels
             AttachCommand = ReactiveCommand.Create(Attach);
             ResumeCommand = ReactiveCommand.Create(ResumeMusic);
             PauseCommand = ReactiveCommand.Create(PauseMusic);
+
+            MediaPlayer = new MediaPlayer(_libVlc);
 
             _musicTimer = new Timer(state =>
             {
@@ -240,23 +251,26 @@ namespace Chat.Client.ViewModels
 
         private void SendMessage()
         {
-            if (!string.IsNullOrWhiteSpace(ChatMessage))
+            if (!string.IsNullOrWhiteSpace(ChatMessage) && SelectedChannel != null)
             {
                 using var packet = new OutPacket(ClientHeader.ClientMessage);
                 var request = new ClientMessage
                 {
+                    Channel = SelectedChannel.Id,
                     Message = ChatMessage,
-                    IsEncrypted = false
                 };
                 packet.Encode(request);
                 ChatClient.Instance.Send(packet);
             }
 
             ChatMessage = string.Empty;
+            Play();
         }
 
         private void Attach()
         {
+            if (SelectedChannel == null) return;
+
             using var ofd = new OpenFileDialog
             {
                 Filter = "MP3 파일 (*.mp3)|*.mp3",
@@ -270,11 +284,12 @@ namespace Chat.Client.ViewModels
 
             data[0] = (byte) AttachmentType.Music;
             Buffer.BlockCopy(file, 0, data, 1, file.Length);
+
             var request = new ClientMessage
             {
+                Channel = SelectedChannel.Id,
                 Message = Path.GetFileName(ofd.FileName),
                 Attachment = data,
-                IsEncrypted = false
             };
             packet.Encode(request);
             ChatClient.Instance.Send(packet);
@@ -324,6 +339,12 @@ namespace Chat.Client.ViewModels
 
             packet.Encode(request);
             ChatClient.Instance.Send(packet);
+        }
+
+        public void Play()
+        {
+            using var media = new Media(_libVlc, "./test.mp4", FromType.FromPath);
+            MediaPlayer.Play(media);
         }
     }
 }

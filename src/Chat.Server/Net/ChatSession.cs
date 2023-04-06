@@ -10,9 +10,9 @@ using Nito.AsyncEx;
 
 namespace Chat.Server.Net;
 
-internal class ChatSession : TcpSession
+public class ChatSession : TcpSession
 {
-    internal ChatClient Client { get; private set; } = null!;
+    public ChatClient Client { get; private set; } = null!;
 
     private string _remoteEndpoint = "";
     private byte[] _sendKey = new byte[8];
@@ -49,19 +49,21 @@ internal class ChatSession : TcpSession
 
         base.SendAsync(data);
 
-        ChatServer.Clients.TryAdd(Id.ToString(), Client);
+        ChatServer.Instance.Clients.TryAdd(Id.ToString(), Client);
         Console.WriteLine($"{_remoteEndpoint}가 연결됨");
     }
 
     protected override void OnDisconnected()
     {
-        ChatServer.Clients.TryRemove(Id.ToString(), out _);
+        ChatServer.Instance.Clients.TryRemove(Id.ToString(), out _);
+        ChatServer.Instance.RemoveClientFromChannel(Client);
+
         Console.WriteLine($"{_remoteEndpoint}가 연결 해제됨");
     }
 
     protected override void OnReceived(byte[] buffer, long offset, long size)
     {
-        Array.Resize(ref buffer, (int)size);
+        Array.Resize(ref buffer, (int) size);
 
         if (size < 4)
         {
@@ -118,7 +120,7 @@ internal class ChatSession : TcpSession
             Thread.Yield();
     }
 
-    internal void Send(OutPacket buffer)
+    internal void Send(OutPacket buffer, bool dispose = true)
     {
         var data = new byte[buffer.Length + 4];
         var encrypted = Encrypt(buffer.Buffer);
@@ -127,7 +129,7 @@ internal class ChatSession : TcpSession
         Array.Copy(encrypted, 0, data, 4, encrypted.Length);
 
         base.SendAsync(data);
-        buffer.Dispose();
+        if (dispose) buffer.Dispose();
 
         if (data.Length <= 1024)
         {

@@ -4,7 +4,7 @@ option csharp_namespace = "Chat.Common.Packet.Data.Client";
 option optimize_for = CODE_SIZE;
 
 message ClientMessage {
-	string message = 1;
-	bool is_encrypted = 2;
+	uint32 channel = 1;
+	string message = 2;
 	optional bytes attachment = 3;
 }
