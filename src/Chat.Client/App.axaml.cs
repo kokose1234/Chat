@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Avalonia;
@@ -21,6 +22,8 @@ namespace Chat.Client
             _ = ChatClient.Instance;
             Console.Title = $"Chat Client - {Constants.Version}";
             PacketHandlers.RegisterPackets();
+
+            if (!Directory.Exists("./Downloads")) Directory.CreateDirectory("./Downloads");
 
             AvaloniaXamlLoader.Load(this);
 

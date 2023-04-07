@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive;
-using System.Threading;
+using System.Windows.Forms;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using Chat.Client.Data;
 using Chat.Client.Data.Types;
 using Chat.Client.Models;
 using Chat.Client.Net;
 using Chat.Client.Tools;
+using Chat.Client.Views;
 using Chat.Common.Data;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
 using DynamicData;
 using DynamicData.Binding;
-using LibVLCSharp.Shared;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using ChatMessage = Chat.Client.Models.ChatMessage;
 using Message = Chat.Common.Data.Message;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
+using Timer = System.Threading.Timer;
 
 namespace Chat.Client.ViewModels
 {
@@ -127,14 +130,6 @@ namespace Chat.Client.ViewModels
 
         #endregion
 
-        #region Video
-
-        public MediaPlayer MediaPlayer { get; }
-
-        private readonly LibVLC _libVlc = new();
-
-        #endregion
-
         public List<UserInfo> Users { get; } = new();
 
         [Reactive]
@@ -155,8 +150,6 @@ namespace Chat.Client.ViewModels
             AttachCommand = ReactiveCommand.Create(Attach);
             ResumeCommand = ReactiveCommand.Create(ResumeMusic);
             PauseCommand = ReactiveCommand.Create(PauseMusic);
-
-            MediaPlayer = new MediaPlayer(_libVlc);
 
             _musicTimer = new Timer(state =>
             {
@@ -249,6 +242,20 @@ namespace Chat.Client.ViewModels
             }
         }
 
+        public void PlayVideo(string filename, byte[] data)
+        {
+            File.WriteAllBytes(Path.Combine("./Downloads", filename), data);
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                var window = new VideoPlayer();
+                var player = new VideoPlayerViewModel();
+                window.DataContext = player;
+                window.Show();
+                player.Play(Path.Combine("./Downloads", filename));
+            });
+        }
+
         private void SendMessage()
         {
             if (!string.IsNullOrWhiteSpace(ChatMessage) && SelectedChannel != null)
@@ -264,7 +271,6 @@ namespace Chat.Client.ViewModels
             }
 
             ChatMessage = string.Empty;
-            Play();
         }
 
         private void Attach()
@@ -273,16 +279,41 @@ namespace Chat.Client.ViewModels
 
             using var ofd = new OpenFileDialog
             {
-                Filter = "MP3 파일 (*.mp3)|*.mp3",
-                Multiselect = false
+                Filter = "음악 파일 (*.mp3)|*.mp3|영상 파일 (*.mp4)|*.mp4",
+                Multiselect = false,
+                CheckFileExists = true,
+                CheckPathExists = true,
+                Title = "파일 선택"
             };
-            if (ofd.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+            if (ofd.ShowDialog() != DialogResult.OK) return;
+            if (ofd.FileName.Length > 50000000)
+            {
+                MessageBox.Show("최대 50MB만 전송할 수 있습니다", "알림");
+                return;
+            }
+
 
             var file = File.ReadAllBytes(ofd.FileName);
             var data = new byte[file.Length + 1];
             using var packet = new OutPacket(ClientHeader.ClientMessage);
 
-            data[0] = (byte) AttachmentType.Music;
+            switch (Path.GetExtension(ofd.FileName))
+            {
+                case ".png":
+                    data[0] = (byte) AttachmentType.Image;
+                    break;
+                case ".mp3":
+                    data[0] = (byte) AttachmentType.Music;
+                    break;
+                case ".mp4":
+                    data[0] = (byte) AttachmentType.Video;
+                    break;
+                default:
+                    data[0] = (byte) AttachmentType.Etc;
+                    break;
+            }
+
             Buffer.BlockCopy(file, 0, data, 1, file.Length);
 
             var request = new ClientMessage
@@ -339,12 +370,6 @@ namespace Chat.Client.ViewModels
 
             packet.Encode(request);
             ChatClient.Instance.Send(packet);
-        }
-
-        public void Play()
-        {
-            using var media = new Media(_libVlc, "./test.mp4", FromType.FromPath);
-            MediaPlayer.Play(media);
         }
     }
 }

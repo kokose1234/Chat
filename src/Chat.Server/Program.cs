@@ -43,6 +43,7 @@ internal static class Program
                     DatabaseManager.Factory.Statement("truncate table messages");
                     DatabaseManager.Factory.Statement("truncate table channel_users");
                     DatabaseManager.Factory.Statement("truncate table channels");
+                    DatabaseManager.Factory.Statement("truncate table friends");
                     DatabaseManager.Factory.Statement("truncate table accounts");
                     break;
             }

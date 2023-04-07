@@ -2,7 +2,8 @@
 
 public enum AttachmentType
 {
-    Image,
-    Music,
+    Image, //png
+    Music, //mp3
+    Video, //mp4
     Etc
 }

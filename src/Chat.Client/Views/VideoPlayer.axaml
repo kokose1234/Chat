@@ -2,8 +2,51 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+        xmlns:vm="using:Chat.Client.ViewModels"
+        mc:Ignorable="d" Width="1280" Height="720"
         x:Class="Chat.Client.Views.VideoPlayer"
+        x:DataType="vm:VideoPlayerViewModel"
+        ExtendClientAreaToDecorationsHint="True" ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1" Background="#17212B"
         Title="VideoPlayer">
-  Welcome to Avalonia!
+    <Design.DataContext>
+        <vm:VideoPlayerViewModel />
+    </Design.DataContext>
+    <Window.Styles>
+        <Style Selector="Image.TopBarButton">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Stretch" Value="Fill" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+        </Style>
+        <Style Selector="Grid.CloseButton:pointerover">
+            <Setter Property="Background" Value="#E92539" />
+        </Style>
+        <Style Selector="Grid.MinButton:pointerover">
+            <Setter Property="Background" Value="#2C3847" />
+        </Style>
+    </Window.Styles>
+    <Grid HorizontalAlignment="Stretch" RowDefinitions="25, *, 30">
+        <Grid Name="TopBar" Background="#242F3D" Height="25" PointerPressed="TopBar_OnPointerPressed">
+            <Grid HorizontalAlignment="Right" ColumnDefinitions="25, 25">
+                <Grid Name="MinimizeButton" Classes="MinButton" Width="25" Height="25"
+                      PointerPressed="MinimizeButton_OnPointerPressed" PointerEnter="MinimizeButton_OnPointerEnter"
+                      PointerLeave="MinimizeButton_OnPointerLeave">
+                    <Image Name="MinimizeImage" Classes="TopBarButton" Source="/Assets/Buttons/minimize-button.png" />
+                </Grid>
+                <Grid Name="CloseButton" Column="1" Classes="TopBarButton CloseButton" Width="25" Height="25"
+                      PointerPressed="CloseButton_OnPointerPressed" PointerEnter="CloseButton_OnPointerEnter"
+                      PointerLeave="CloseButton_OnPointerLeave">
+                    <Image Name="CloseImage" Classes="TopBarButton" Source="/Assets/Buttons/close-button.png" />
+                </Grid>
+            </Grid>
+        </Grid>
+        <Panel Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <vlc:VideoView MediaPlayer="{Binding MediaPlayer}" HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch" />
+        </Panel>
+
+    </Grid>
 </Window>

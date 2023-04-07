@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Chat.Client.Data.Types;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
@@ -19,14 +20,20 @@ public class MessageHandler : AbstractHandler
         }
 
         var fileData = new byte[data.Message.Attachment.Length - 1];
+        var fileName = data.Message.Text;
         System.Buffer.BlockCopy(data.Message.Attachment, 1, fileData, 0, fileData.Length);
 
-        switch (data.Message.Attachment[0])
+        switch ((AttachmentType) data.Message.Attachment[0])
         {
-            case 1: // mp3
+            case AttachmentType.Music:
                 data.Message.Text = $"{data.Message.Text} 재생";
                 session.ViewModel.AddMessage(data.Message);
                 session.ViewModel.PlayMusic(fileData);
+                break;
+            case AttachmentType.Video:
+                data.Message.Text = $"{data.Message.Text} 재생";
+                session.ViewModel.AddMessage(data.Message);
+                session.ViewModel.PlayVideo(fileName, fileData);
                 break;
         }
 
