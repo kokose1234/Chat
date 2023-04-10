@@ -21,7 +21,8 @@ internal class ChatServer : TcpServer
     public ChatServer(IPAddress address, int port) : base(address, port)
     {
         Instance = this;
-        OptionReceiveBufferSize = 65536;
+        OptionReceiveBufferSize = ushort.MaxValue;
+        OptionSendBufferSize = ushort.MaxValue;
         OptionNoDelay = true;
         OptionKeepAlive = true;
 

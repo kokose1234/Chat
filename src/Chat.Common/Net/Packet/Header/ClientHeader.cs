@@ -10,5 +10,6 @@ namespace Chat.Common.Net.Packet.Header
         ClientMessageSync = 3009919302,
         ClientPong = 2767742975,
         ClientSyncMusic = 158472322,
+        ClientSyncVideo = 3102204132,
     }
 }

@@ -101,9 +101,19 @@ public class ChatSession : TcpSession
 
                 _incompletePackets.Add(new(buffer, (int) offset + index, (int) remainingBytes));
 
-                var data = _incompletePackets
-                           .SelectMany(segment => segment.Array[segment.Offset..(segment.Offset + segment.Count)])
-                           .ToArray();
+                var dataLength = _incompletePackets.Sum(x => x.Count);
+                var data = new byte[dataLength];
+                var dataOffset = 0;
+
+                foreach (var segment in _incompletePackets)
+                {
+                    System.Buffer.BlockCopy(segment.Array, segment.Offset, data, dataOffset, segment.Count);
+                    dataOffset += segment.Count;
+                }
+
+                // var data = _incompletePackets
+                //            .SelectMany(segment => segment.Array[segment.Offset..(segment.Offset + segment.Count)])
+                //            .ToArray();
 
                 _rawRecvQueue.Enqueue(new(data));
                 _recvCondition.Notify();
@@ -131,7 +141,7 @@ public class ChatSession : TcpSession
         base.SendAsync(data);
         if (dispose) buffer.Dispose();
 
-        if (data.Length <= 1024)
+        if (data.Length <= 256)
         {
             var headerName = FastEnum.GetName((ServerHeader) buffer.Header) ?? string.Format($"0x{buffer.Header:X4}");
             Console.WriteLine($"[S->C] [{headerName}]\r\n{buffer}");

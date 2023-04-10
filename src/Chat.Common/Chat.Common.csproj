@@ -14,6 +14,7 @@
     <None Remove="Proto\ClientMessage.proto" />
     <None Remove="Proto\ClientMessageSync.proto" />
     <None Remove="Proto\ClientSyncMusic.proto" />
+    <None Remove="Proto\ClientSyncVideo.proto" />
     <None Remove="Proto\Data\ChannelInfo.proto" />
     <None Remove="Proto\Data\Message.proto" />
     <None Remove="Proto\Data\UserInfo.proto" />
@@ -21,6 +22,7 @@
     <None Remove="Proto\ServerMessage.proto" />
     <None Remove="Proto\ServerMessageSync.proto" />
     <None Remove="Proto\ServerSyncMusic.proto" />
+    <None Remove="Proto\ServerSyncVideo.proto" />
     <None Remove="Proto\ServerUserList.proto" />
   </ItemGroup>
 
@@ -31,6 +33,8 @@
     <AdditionalFiles Include="Proto\ClientMessage.proto" />
     <AdditionalFiles Include="Proto\ClientMessageSync.proto" />
     <AdditionalFiles Include="Proto\ClientPong.proto" />
+    <AdditionalFiles Include="Proto\ClientSyncVideo.proto" />
+    <AdditionalFiles Include="Proto\ServerSyncVideo.proto" />
     <AdditionalFiles Include="Proto\ServerSyncMusic.proto" />
     <AdditionalFiles Include="Proto\Data\Message.proto" />
     <AdditionalFiles Include="Proto\Data\ChannelInfo.proto" />
@@ -59,6 +63,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

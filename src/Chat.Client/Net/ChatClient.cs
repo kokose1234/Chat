@@ -35,7 +35,8 @@ internal sealed class ChatClient : TcpClient
 
     internal ChatClient(string address, int port) : base(address, port)
     {
-        OptionReceiveBufferSize = 65536;
+        OptionReceiveBufferSize = ushort.MaxValue;
+        OptionSendBufferSize = ushort.MaxValue;
         OptionNoDelay = true;
         OptionKeepAlive = true;
 
@@ -105,9 +106,19 @@ internal sealed class ChatClient : TcpClient
 
                     _incompletePackets.Add(new(buffer, (int) offset + index, (int) remainingBytes));
 
-                    var data = _incompletePackets
-                               .SelectMany(segment => segment.Array[segment.Offset..(segment.Offset + segment.Count)])
-                               .ToArray();
+                    var dataLength = _incompletePackets.Sum(x => x.Count);
+                    var data = new byte[dataLength];
+                    var dataOffset = 0;
+
+                    foreach (var segment in _incompletePackets)
+                    {
+                        System.Buffer.BlockCopy(segment.Array, segment.Offset, data, dataOffset, segment.Count);
+                        dataOffset += segment.Count;
+                    }
+
+                    // var data = _incompletePackets
+                    //            .SelectMany(segment => segment.Array[segment.Offset..(segment.Offset + segment.Count)])
+                    //            .ToArray();
 
                     _rawRecvQueue.Enqueue(new(data));
                     _recvCondition.Notify();

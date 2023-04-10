@@ -130,6 +130,8 @@ namespace Chat.Client.ViewModels
 
         #endregion
 
+        public VideoPlayerViewModel? VideoPlayer { get; private set; }
+
         public List<UserInfo> Users { get; } = new();
 
         [Reactive]
@@ -244,15 +246,21 @@ namespace Chat.Client.ViewModels
 
         public void PlayVideo(string filename, byte[] data)
         {
-            File.WriteAllBytes(Path.Combine("./Downloads", filename), data);
+            if (SelectedChannel == null) return;
+
+            if (!File.Exists(Path.Combine("./Downloads", filename)))
+            {
+                File.WriteAllBytes(Path.Combine("./Downloads", filename), data);
+            }
 
             Dispatcher.UIThread.Post(() =>
             {
                 var window = new VideoPlayer();
-                var player = new VideoPlayerViewModel();
+                var player = new VideoPlayerViewModel(SelectedChannel.Id);
                 window.DataContext = player;
-                window.Show();
+                VideoPlayer = player;
                 player.Play(Path.Combine("./Downloads", filename));
+                window.Show();
             });
         }
 
@@ -287,32 +295,26 @@ namespace Chat.Client.ViewModels
             };
 
             if (ofd.ShowDialog() != DialogResult.OK) return;
+
+#if !DEBUG
             if (ofd.FileName.Length > 50000000)
             {
                 MessageBox.Show("최대 50MB만 전송할 수 있습니다", "알림");
                 return;
             }
-
+#endif
 
             var file = File.ReadAllBytes(ofd.FileName);
             var data = new byte[file.Length + 1];
             using var packet = new OutPacket(ClientHeader.ClientMessage);
 
-            switch (Path.GetExtension(ofd.FileName))
+            data[0] = Path.GetExtension(ofd.FileName) switch
             {
-                case ".png":
-                    data[0] = (byte) AttachmentType.Image;
-                    break;
-                case ".mp3":
-                    data[0] = (byte) AttachmentType.Music;
-                    break;
-                case ".mp4":
-                    data[0] = (byte) AttachmentType.Video;
-                    break;
-                default:
-                    data[0] = (byte) AttachmentType.Etc;
-                    break;
-            }
+                ".png" => (byte) AttachmentType.Image,
+                ".mp3" => (byte) AttachmentType.Music,
+                ".mp4" => (byte) AttachmentType.Video,
+                _ => (byte) AttachmentType.Etc
+            };
 
             Buffer.BlockCopy(file, 0, data, 1, file.Length);
 

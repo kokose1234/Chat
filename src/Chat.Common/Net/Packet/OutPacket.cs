@@ -8,7 +8,7 @@ public class OutPacket : AbstractPacket
     public uint Header { get; }
     public bool Disposed { get; }
 
-    public OutPacket(int size = 64)
+    public OutPacket(int size = byte.MaxValue)
     {
         stream = new MemoryStream(size);
         Disposed = false;
@@ -20,13 +20,9 @@ public class OutPacket : AbstractPacket
         stream.Write(BitConverter.GetBytes(header), 0, 4);
     }
 
-    public OutPacket(ServerHeader header) : this((uint)header)
-    {
-    }
+    public OutPacket(ServerHeader header) : this((uint) header) { }
 
-    public OutPacket(ClientHeader header) : this((uint)header)
-    {
-    }
+    public OutPacket(ClientHeader header) : this((uint) header) { }
 
     public void Encode<T>(T data)
     {

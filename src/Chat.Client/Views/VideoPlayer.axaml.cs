@@ -73,4 +73,18 @@ public partial class VideoPlayer : ReactiveWindow<VideoPlayerViewModel>
         var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/close-button.png"));
         CloseImage.Source = new Bitmap(asset);
     }
+
+    private void PlayButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+        ViewModel?.ResumeCommand.Execute().Subscribe();
+        ViewModel?.SendResumeVideoPacket();
+    }
+
+    private void PauseButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+        ViewModel?.PauseCommand.Execute().Subscribe();
+        ViewModel?.SendPauseVideoPacket();
+    }
 }

@@ -4,15 +4,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
         xmlns:vm="using:Chat.Client.ViewModels"
+        xmlns:conv="using:Chat.Client.Data.Converters"
         mc:Ignorable="d" Width="1280" Height="720"
         x:Class="Chat.Client.Views.VideoPlayer"
         x:DataType="vm:VideoPlayerViewModel"
+        Icon="/Assets/avalonia-logo.ico"
         ExtendClientAreaToDecorationsHint="True" ExtendClientAreaChromeHints="NoChrome"
-        ExtendClientAreaTitleBarHeightHint="-1" Background="#17212B"
+        ExtendClientAreaTitleBarHeightHint="-1" Background="#17212B" CanResize="False"
         Title="VideoPlayer">
+
     <Design.DataContext>
         <vm:VideoPlayerViewModel />
     </Design.DataContext>
+
+    <Window.Resources>
+        <conv:TimeConverter x:Key="timeConverter" />
+    </Window.Resources>
+
     <Window.Styles>
         <Style Selector="Image.TopBarButton">
             <Setter Property="HorizontalAlignment" Value="Center" />
@@ -28,6 +36,7 @@
             <Setter Property="Background" Value="#2C3847" />
         </Style>
     </Window.Styles>
+
     <Grid HorizontalAlignment="Stretch" RowDefinitions="25, *, 30">
         <Grid Name="TopBar" Background="#242F3D" Height="25" PointerPressed="TopBar_OnPointerPressed">
             <Grid HorizontalAlignment="Right" ColumnDefinitions="25, 25">
@@ -47,6 +56,23 @@
             <vlc:VideoView MediaPlayer="{Binding MediaPlayer}" HorizontalAlignment="Stretch"
                            VerticalAlignment="Stretch" />
         </Panel>
-
+        <WrapPanel Grid.Row="2" Margin="3" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid>
+                <Image Name="PlayButton" IsVisible="{Binding IsPaused}"
+                       Source="/Assets/Buttons/play.png" PointerPressed="PlayButton_OnPointerPressed" />
+                <Image Name="PauseButton" IsVisible="{Binding !IsPaused}"
+                       Source="/Assets/Buttons/pause.png" PointerPressed="PauseButton_OnPointerPressed" />
+            </Grid>
+            <Slider Name="PositionSlider" Maximum="{Binding Length}" Value="{Binding Position}"
+                    Width="1000"
+                    VerticalAlignment="Center" Margin="10,0" Padding="0,0,0,20" />
+            <Label Content="{Binding Position, Converter={StaticResource timeConverter}}"
+                   VerticalContentAlignment="Center" FontFamily="나눔고딕" />
+            <Label Content="/" VerticalContentAlignment="Center" FontFamily="나눔고딕" />
+            <Label Content="{Binding Length, Converter={StaticResource timeConverter}}"
+                   VerticalContentAlignment="Center" FontFamily="나눔고딕" />
+            <Slider Name="VolumeSlider" Maximum="100" Value="{Binding Volume}" Width="120"
+                    VerticalAlignment="Center" Margin="10,0" Padding="0,0,0,20" />
+        </WrapPanel>
     </Grid>
 </Window>
