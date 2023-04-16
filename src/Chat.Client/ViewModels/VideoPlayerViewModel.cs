@@ -31,8 +31,8 @@ public class VideoPlayerViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ResumeCommand { get; }
     public ReactiveCommand<Unit, Unit> PauseCommand { get; }
 
+    private readonly uint _channel;
     private int _position;
-    private uint _channel;
 
     public int Position
     {

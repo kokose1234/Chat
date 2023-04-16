@@ -11,29 +11,43 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Proto\ClientAddFriend.proto" />
     <None Remove="Proto\ClientMessage.proto" />
     <None Remove="Proto\ClientMessageSync.proto" />
+    <None Remove="Proto\ClientRemoveFriend.proto" />
+    <None Remove="Proto\ClientStartChat.proto" />
     <None Remove="Proto\ClientSyncMusic.proto" />
     <None Remove="Proto\ClientSyncVideo.proto" />
+    <None Remove="Proto\ClientUserSearch.proto" />
     <None Remove="Proto\Data\ChannelInfo.proto" />
     <None Remove="Proto\Data\Message.proto" />
     <None Remove="Proto\Data\UserInfo.proto" />
+    <None Remove="Proto\ServerAddFriend.proto" />
     <None Remove="Proto\ServerChannelSync.proto" />
     <None Remove="Proto\ServerMessage.proto" />
     <None Remove="Proto\ServerMessageSync.proto" />
+    <None Remove="Proto\ServerRemoveFriend.proto" />
     <None Remove="Proto\ServerSyncMusic.proto" />
     <None Remove="Proto\ServerSyncVideo.proto" />
     <None Remove="Proto\ServerUserList.proto" />
+    <None Remove="Proto\ServerUserSearchResult.proto" />
   </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="Proto\ClientAccountRegister.proto" />
+    <AdditionalFiles Include="Proto\ServerRemoveFriend.proto" />
+    <AdditionalFiles Include="Proto\ServerAddFriend.proto" />
+    <AdditionalFiles Include="Proto\ClientStartChat.proto" />
+    <AdditionalFiles Include="Proto\ClientRemoveFriend.proto" />
     <AdditionalFiles Include="Proto\ClientEditProfile.proto" />
     <AdditionalFiles Include="Proto\ClientLogin.proto" />
     <AdditionalFiles Include="Proto\ClientMessage.proto" />
     <AdditionalFiles Include="Proto\ClientMessageSync.proto" />
+    <AdditionalFiles Include="Proto\ClientAddFriend.proto" />
+    <AdditionalFiles Include="Proto\ClientUserSearch.proto" />
     <AdditionalFiles Include="Proto\ClientPong.proto" />
     <AdditionalFiles Include="Proto\ClientSyncVideo.proto" />
+    <AdditionalFiles Include="Proto\ServerUserSearchResult.proto" />
     <AdditionalFiles Include="Proto\ServerSyncVideo.proto" />
     <AdditionalFiles Include="Proto\ServerSyncMusic.proto" />
     <AdditionalFiles Include="Proto\Data\Message.proto" />
@@ -54,7 +68,7 @@
     <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
     <PackageReference Include="BlowFish" Version="1.0.2" />
     <PackageReference Include="FastEnum" Version="1.8.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.22.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.22.3" />
     <PackageReference Include="NetCoreServer" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.1.3" />

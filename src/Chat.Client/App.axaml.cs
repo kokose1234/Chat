@@ -36,10 +36,8 @@ namespace Chat.Client
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = new MainWindowViewModel(desktop.MainWindow),
-                };
+                desktop.MainWindow = new MainWindow();
+                desktop.MainWindow.DataContext = new MainWindowViewModel(desktop.MainWindow);
             }
 
             base.OnFrameworkInitializationCompleted();

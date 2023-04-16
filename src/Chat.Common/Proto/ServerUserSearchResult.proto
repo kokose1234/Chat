@@ -1,0 +1,14 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Server";
+
+message ServerUserSearchResult {
+	map<uint32, User> user_map = 1;
+
+	message User {
+		string username = 1;
+		string nickname = 2;
+		string message = 3;
+		optional bytes avatar = 4;
+	}
+}

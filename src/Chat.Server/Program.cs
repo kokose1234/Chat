@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Chat.Server.Database;
 using Chat.Server.Net;
+using SqlKata.Execution;
 
 namespace Chat.Server;
 
@@ -13,21 +14,6 @@ internal static class Program
         var server = new ChatServer(IPAddress.Any, 9000);
         PacketHandlers.RegisterPackets();
         server.Start();
-
-        // var data = File.ReadAllBytes("./test.png");
-        //
-        // for (var i = 0; i < 10; i++)
-        // {
-        //     DatabaseManager.Factory.Query("messages").Insert(new
-        //     {
-        //         channel_id = 1,
-        //         user_id = 1,
-        //         date = 0,
-        //         message = (string?)null,
-        //         attachment = data,
-        //         is_encrypted = 0
-        //     });
-        // }
 
 
         while (true)
@@ -46,6 +32,23 @@ internal static class Program
                     DatabaseManager.Factory.Statement("truncate table friends");
                     DatabaseManager.Factory.Statement("truncate table accounts");
                     break;
+                case "/test":
+                {
+                    for (var i = 1; i <= 6; i++)
+                    {
+                        var data = File.ReadAllBytes($"./{i}.png");
+                        DatabaseManager.Factory.Query("accounts").Where("id", i).Update(new
+                        {
+                            avatar = data
+                        });
+                    }
+
+                    DatabaseManager.Factory.Query("accounts").Where("id", 7).Update(new
+                    {
+                        avatar = File.ReadAllBytes("./7.jpeg")
+                    });
+                    break;
+                }
             }
         }
     }

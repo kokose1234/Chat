@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Windows.Forms;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -51,6 +52,7 @@ namespace Chat.Client.ViewModels
         #region Messages
 
         public IObservableCollection<Channel> Channels { get; } = new ObservableCollectionExtended<Channel>();
+        public IObservableCollection<UserSearchResult> SearchUsers { get; } = new ObservableCollectionExtended<UserSearchResult>();
         public IObservableCollection<ChatMessage> Messages { get; } = new ObservableCollectionExtended<ChatMessage>();
         public IObservableCollection<ChatMessage> CurrentMessages { get; } = new ObservableCollectionExtended<ChatMessage>();
 
@@ -130,6 +132,15 @@ namespace Chat.Client.ViewModels
 
         #endregion
 
+        #region SearchUser
+
+        [Reactive]
+        public UserSearchResult? SelectedUser { get; set; }
+
+        public ReactiveCommand<Unit, Unit> OpenUserInfoCommand { get; }
+
+        #endregion
+
         public VideoPlayerViewModel? VideoPlayer { get; private set; }
 
         public List<UserInfo> Users { get; } = new();
@@ -137,7 +148,7 @@ namespace Chat.Client.ViewModels
         [Reactive]
         public string SearchTerm { get; set; } = string.Empty;
 
-        private Window _window;
+        private readonly Window _window;
         private SoundPlayer? _player;
 
         public MainWindowViewModel() { }
@@ -152,6 +163,7 @@ namespace Chat.Client.ViewModels
             AttachCommand = ReactiveCommand.Create(Attach);
             ResumeCommand = ReactiveCommand.Create(ResumeMusic);
             PauseCommand = ReactiveCommand.Create(PauseMusic);
+            OpenUserInfoCommand = ReactiveCommand.Create(OpenUserInfo);
 
             _musicTimer = new Timer(state =>
             {
@@ -170,6 +182,12 @@ namespace Chat.Client.ViewModels
                         CurrentMessages.AddRange(Messages.Where(m => m.ChannelId == channel.Id));
                     }
                 });
+
+            this.WhenAnyValue(x => x.SearchTerm)
+                .Select(x => x.Trim())
+                .DistinctUntilChanged()
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ForEachAsync(SendUserSearch);
         }
 
         private void Login()
@@ -352,6 +370,20 @@ namespace Chat.Client.ViewModels
             }
         }
 
+        private void OpenUserInfo()
+        {
+            if (SelectedUser == null) return;
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                var match = Users.FirstOrDefault(x => x.Id == SelectedUser.Id, null);
+                var window = new AddFriendWindow();
+                var player = new UserInfoViewModel(SelectedUser, match?.IsFriend ?? false, this);
+                window.DataContext = player;
+                window.ShowDialog(_window);
+            });
+        }
+
         public void SendResumeMusicPacket()
         {
             if (SelectedChannel == null) return;
@@ -370,6 +402,14 @@ namespace Chat.Client.ViewModels
             using var packet = new OutPacket(ClientHeader.ClientSyncMusic);
             var request = new ClientSyncMusic {Channel = SelectedChannel.Id, Data = int.MinValue + 2};
 
+            packet.Encode(request);
+            ChatClient.Instance.Send(packet);
+        }
+
+        private void SendUserSearch(string term)
+        {
+            using var packet = new OutPacket(ClientHeader.ClientUserSearch);
+            var request = new ClientUserSearch {SearchTerm = term};
             packet.Encode(request);
             ChatClient.Instance.Send(packet);
         }

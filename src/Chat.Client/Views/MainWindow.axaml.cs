@@ -25,7 +25,11 @@ namespace Chat.Client.Views
             {
                 this.OneWayBind(ViewModel, vm => vm.Channels, v => v.ChannelList.Items)
                     .DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.SearchUsers, v => v.SearchUserList.Items)
+                    .DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.SelectedChannel, v => v.ChannelList.SelectedItem)
+                    .DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedUser, v => v.SearchUserList.SelectedItem)
                     .DisposeWith(disposables);
             });
 
@@ -124,6 +128,11 @@ namespace Chat.Client.Views
             if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
             ViewModel?.PauseCommand.Execute().Subscribe();
             ViewModel?.SendPauseMusicPacket();
+        }
+
+        private void ShowUserInfo_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            ViewModel?.OpenUserInfoCommand.Execute().Subscribe();
         }
     }
 }

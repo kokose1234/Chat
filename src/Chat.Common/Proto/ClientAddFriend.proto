@@ -1,0 +1,7 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Client";
+
+message ClientAddFriend {
+	uint64 id = 1;
+}

@@ -53,6 +53,7 @@
 
   <ItemGroup>
     <Folder Include="Data\Converters\" />
+    <Folder Include="Data\DialogResults\" />
     <Folder Include="Data\Types\" />
     <Folder Include="Database\" />
   </ItemGroup>

@@ -9,6 +9,7 @@
         xmlns:conv="using:Chat.Client.Data.Converters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:data="clr-namespace:Chat.Client.Data"
         mc:Ignorable="d" Width="800" Height="500"
         x:Class="Chat.Client.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -118,13 +119,38 @@
                              VerticalAlignment="Center" Margin="5" Width="150" Text="{Binding SearchTerm}" />
                 </Grid>
                 <ScrollViewer Grid.Row="1" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Hidden" Margin="5">
+                              HorizontalScrollBarVisibility="Hidden" Margin="5"
+                              IsVisible="{Binding SearchTerm,Converter={x:Static StringConverters.IsNullOrEmpty}}">
                     <ListBox Name="ChannelList" SelectedIndex="-1">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#E9E9E9" />
                                     <TextBlock Text="{Binding Description}" Foreground="#497EB5" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </ScrollViewer>
+                <ScrollViewer Grid.Row="1" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Hidden" Margin="5"
+                              IsVisible="{Binding SearchTerm, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <ListBox Name="SearchUserList" SelectedIndex="-1">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Name="UserInfoItem" HorizontalAlignment="Stretch">
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu Name="UserInfoContextMenu" PlacementMode="Pointer">
+                                            <MenuItem Name="ShowUserInfo" Header="정보 보기" PointerPressed="ShowUserInfo_OnPointerPressed">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Assets/Icons/info.png" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+
+                                    <TextBlock Text="{Binding Nickname}" FontWeight="Bold" Foreground="#E9E9E9" />
+                                    <TextBlock Text="{Binding Username}" Foreground="#497EB5" />
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

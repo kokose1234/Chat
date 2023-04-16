@@ -1,0 +1,158 @@
+<!-- <Window xmlns="https://github.com/avaloniaui" -->
+<!--         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" -->
+<!--         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" -->
+<!--         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" -->
+<!--         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity" -->
+<!--         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions" -->
+<!--         xmlns:vm="using:Chat.Client.ViewModels" -->
+<!--         xmlns:conv="using:Chat.Client.Data.Converters" -->
+<!--         mc:Ignorable="d" Width="250" Height="200" -->
+<!--         x:Class="Chat.Client.Views.AddFriendWindow" -->
+<!--         x:DataType="vm:UserInfoViewModel" -->
+<!--         ExtendClientAreaToDecorationsHint="True" ExtendClientAreaChromeHints="NoChrome" -->
+<!--         ExtendClientAreaTitleBarHeightHint="-1" Background="#17212B" CanResize="False" -->
+<!--         ShowInTaskbar="False"> -->
+<!-- -->
+<!--     <Design.DataContext> -->
+<!--         <vm:UserInfoViewModel IsFriend="True" /> -->
+<!--     </Design.DataContext> -->
+<!-- -->
+<!--     <Window.Styles> -->
+<!--         <Style Selector="Image.TopBarButton"> -->
+<!--             <Setter Property="HorizontalAlignment" Value="Center" /> -->
+<!--             <Setter Property="VerticalAlignment" Value="Center" /> -->
+<!--             <Setter Property="Stretch" Value="Fill" /> -->
+<!--             <Setter Property="Width" Value="30" /> -->
+<!--             <Setter Property="Height" Value="30" /> -->
+<!--         </Style> -->
+<!--     </Window.Styles> -->
+<!-- -->
+<!--     <i:Interaction.Behaviors> -->
+<!--         <ia:DataTriggerBehavior Binding="{Binding IsFriend}" ComparisonCondition="Equal" Value="True"> -->
+<!--             <ia:ChangePropertyAction TargetObject="AddFriendButton" PropertyName="Text" Value="친구 삭제" /> -->
+<!--         </ia:DataTriggerBehavior> -->
+<!--         <ia:DataTriggerBehavior Binding="{Binding IsFriend}" ComparisonCondition="Equal" Value="False"> -->
+<!--             <ia:ChangePropertyAction TargetObject="AddFriendButton" PropertyName="Text" Value="친구 추가" /> -->
+<!--         </ia:DataTriggerBehavior> -->
+<!--     </i:Interaction.Behaviors> -->
+<!-- -->
+<!--     <Grid HorizontalAlignment="Stretch" RowDefinitions="40, 100, 5, 50, *"> -->
+<!--         <Grid ColumnDefinitions="*, 40"> -->
+<!--             <TextBlock VerticalAlignment="Center" Text="회원 정보" FontSize="18" FontFamily="나눔고딕" Margin="15,0" /> -->
+<!--             <Grid Name="CloseButton" Column="1" Classes="TopBarButton" Width="30" Height="30" -->
+<!--                   PointerPressed="CloseButton_OnPointerPressed" PointerEnter="CloseButton_OnPointerEnter" -->
+<!--                   PointerLeave="CloseButton_OnPointerLeave"> -->
+<!--                 <Image Name="CloseImage" Classes="TopBarButton" Source="/Assets/Buttons/close-button.png" -->
+<!--                        Stretch="UniformToFill" /> -->
+<!--             </Grid> -->
+<!--         </Grid> -->
+<!--         <Grid Row="1" Margin="10,0" ColumnDefinitions="70, *" HorizontalAlignment="Left" VerticalAlignment="Center"> -->
+<!--             <Border ClipToBounds="True" CornerRadius="30"> -->
+<!--                 <Image Source="{Binding Avatar}" Width="70" Height="70" Stretch="UniformToFill" StretchDirection="Both" /> -->
+<!--             </Border> -->
+<!--             <StackPanel Grid.Column="1"> -->
+<!--                 <TextBlock Text="{Binding UserInfo.Nickname}" FontSize="18" FontFamily="나눔고딕" -->
+<!--                            VerticalAlignment="Center" -->
+<!--                            Margin="5,7,0, 0" /> -->
+<!--                 <TextBlock Text="{Binding UserInfo.Message}" FontSize="10" FontFamily="나눔고딕" -->
+<!--                            VerticalAlignment="Center" Foreground="#708499" -->
+<!--                            Margin="5,3,0, 0" /> -->
+<!--             </StackPanel> -->
+<!-- -->
+<!--         </Grid> -->
+<!--         <Grid Row="2" Background="#232E3C" /> -->
+<!--         <Grid Row="3" ColumnDefinitions="20 ,*" Margin="10, 0"> -->
+<!--             <Image Width="20" Height="20" Source="/Assets/Icons/info.png" /> -->
+<!--             <StackPanel Grid.Column="1" Margin="10,0,0,5" VerticalAlignment="Center"> -->
+<!--                 <TextBlock Text="{Binding UserInfo.Username}" FontSize="10" FontFamily="나눔고딕" -->
+<!--                            VerticalAlignment="Center" -->
+<!--                            Foreground="#439DD5" /> -->
+<!--                 <TextBlock x:Name="AddFriendButton" FontSize="10" FontFamily="나눔고딕" VerticalAlignment="Center" -->
+<!--                            Foreground="#439DD5" -->
+<!--                            FontWeight="Bold" /> -->
+<!--                 <TextBlock Text="메시지 보내기" FontSize="10" FontFamily="나눔고딕" VerticalAlignment="Center" -->
+<!--                            Foreground="#439DD5" /> -->
+<!--             </StackPanel> -->
+<!--         </Grid> -->
+<!--     </Grid> -->
+<!-- </Window> -->
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        xmlns:vm="using:Chat.Client.ViewModels"
+        xmlns:conv="using:Chat.Client.Data.Converters"
+        mc:Ignorable="d" Width="500" Height="400"
+        x:Class="Chat.Client.Views.AddFriendWindow"
+        x:DataType="vm:UserInfoViewModel"
+        ExtendClientAreaToDecorationsHint="True" ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1" Background="#17212B" CanResize="False"
+        ShowInTaskbar="False">
+
+    <Design.DataContext>
+        <vm:UserInfoViewModel IsFriend="True" />
+    </Design.DataContext>
+
+    <Window.Styles>
+        <Style Selector="Image.TopBarButton">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Stretch" Value="Fill" />
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+        </Style>
+    </Window.Styles>
+
+    <i:Interaction.Behaviors>
+        <ia:DataTriggerBehavior Binding="{Binding IsFriend}" ComparisonCondition="Equal" Value="True">
+            <ia:ChangePropertyAction TargetObject="AddFriendButton" PropertyName="Text" Value="친구 삭제" />
+        </ia:DataTriggerBehavior>
+        <ia:DataTriggerBehavior Binding="{Binding IsFriend}" ComparisonCondition="Equal" Value="False">
+            <ia:ChangePropertyAction TargetObject="AddFriendButton" PropertyName="Text" Value="친구 추가" />
+        </ia:DataTriggerBehavior>
+    </i:Interaction.Behaviors>
+
+    <Grid HorizontalAlignment="Stretch" RowDefinitions="80, 200, 10, 100, *" ColumnDefinitions="*,Auto">
+        <Grid Name="Header" Grid.ColumnSpan="2" ColumnDefinitions="*, Auto">
+            <TextBlock VerticalAlignment="Center" Text="회원 정보" FontSize="36" FontFamily="나눔고딕" Margin="30,0" />
+            <Grid Name="CloseButton" Column="1" Width="30" Height="30" VerticalAlignment="Top" Margin="5"
+                  PointerPressed="CloseButton_OnPointerPressed" PointerEnter="CloseButton_OnPointerEnter"
+                  PointerLeave="CloseButton_OnPointerLeave">
+                <Image Name="CloseImage" Source="/Assets/Buttons/close-button.png"
+                       Stretch="UniformToFill" Width="30" Height="30" />
+            </Grid>
+        </Grid>
+        <Grid Row="1" Margin="20,0" ColumnDefinitions="100, *" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Border ClipToBounds="True" CornerRadius="60">
+                <Image Source="{Binding Avatar}" Width="100" Height="100" Stretch="UniformToFill"
+                       StretchDirection="Both" />
+            </Border>
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="{Binding UserInfo.Nickname}" FontSize="36" FontFamily="나눔고딕"
+                           VerticalAlignment="Center"
+                           Margin="10,14,0, 0" />
+                <TextBlock Text="{Binding UserInfo.Message}" FontSize="20" FontFamily="나눔고딕"
+                           VerticalAlignment="Center" Foreground="#708499"
+                           Margin="10,6,0, 0" />
+            </StackPanel>
+
+        </Grid>
+        <Grid Row="2" Background="#232E3C" />
+        <Grid Row="3" ColumnDefinitions="40 ,*" Margin="20, 0">
+            <Image Width="40" Height="40" Source="/Assets/Icons/info.png" />
+            <StackPanel Grid.Column="1" Margin="20,0,0,10" VerticalAlignment="Center">
+                <TextBlock Text="{Binding UserInfo.Username}" FontSize="20" FontFamily="나눔고딕"
+                           VerticalAlignment="Center"
+                           Foreground="#439DD5" />
+                <TextBlock x:Name="AddFriendButton" FontSize="20" FontFamily="나눔고딕" VerticalAlignment="Center"
+                           Foreground="#439DD5" PointerPressed="AddFriendButton_OnPointerPressed"
+                           FontWeight="Bold" />
+                <TextBlock Text="메시지 보내기" FontSize="20" FontFamily="나눔고딕" VerticalAlignment="Center"
+                           Foreground="#439DD5" PointerPressed="InputElement_OnPointerPressed" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

@@ -14,13 +14,13 @@ public class UserListHandler : AbstractHandler
     {
         var data = inPacket.Decode<ServerUserList>();
         session.ViewModel.Users.AddRange(data.Users);
-        
+
         using var packet = new OutPacket(ClientHeader.ClientMessageSync);
         var request = new ClientMessageSync
         {
             LastMessageId = 0 //TODO: use LiteDB
         };
-        
+
         packet.Encode(request);
         session.Send(packet);
 

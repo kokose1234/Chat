@@ -16,6 +16,8 @@ public class LoginHandler : AbstractHandler
     internal override async Task Handle(ChatSession session, InPacket inPacket)
     {
         var request = inPacket.Decode<ClientLogin>();
+        uint userId;
+        dynamic self;
 
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
@@ -51,41 +53,52 @@ public class LoginHandler : AbstractHandler
             client.Username = account[0].username;
             client.Name = account[0].name;
             client.IsAdmin = account[0].admin == 1;
+            userId = account[0].id;
+            self = account[0];
 
             session.Send(packet);
-            
+
             ChatServer.Instance.AddClientToChannel(client);
         }
 
-        //TODO: 친구, 같은 대화방 사람만 보내기
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
             using var packet = new OutPacket(ServerHeader.ServerUserList);
-            var users = (await DatabaseManager.Factory.Query("accounts").GetAsync()).ToImmutableArray();
+            var channelUsers = await DatabaseManager.Factory.Query("accounts")
+                                                    .Join("channel_users", "accounts.id", "channel_users.user_id")
+                                                    .Where("channel_users.user_id", userId)
+                                                    .Distinct()
+                                                    .GetAsync();
+            var friends = (await DatabaseManager.Factory.Query("accounts")
+                                                .Join("friends", "accounts.id", "friends.friend_user_id")
+                                                .Where("friends.user_id", userId)
+                                                .Distinct()
+                                                .GetAsync()).ToImmutableArray();
+            var users = channelUsers.Concat(friends).ToList();
+            users.Add(self);
             var userList = new ServerUserList();
 
-            userList.Users.AddRange(users.Select(user => new UserInfo
+            userList.Users.AddRange(users.DistinctBy(x => x.id).Select(user => new UserInfo
             {
                 Id = user.id,
                 Name = user.name,
+                IsFriend = friends.Any(x => x.id == user.id),
+                IsMe = user.id == userId,
             }));
 
             packet.Encode(userList);
             session.Send(packet);
         }
 
-        //TODO: From ChatServer
-        using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
             using var packet = new OutPacket(ServerHeader.ServerChannelSync);
-            var channelIds = (await DatabaseManager.Factory.Query("channel_users").Select("channel_id").Where("user_id", session.Client.Id).Distinct().GetAsync<int>()).ToArray();
-            var channels = (await DatabaseManager.Factory.Query("channels").WhereIn("id", channelIds).GetAsync()).ToImmutableArray();
+            var channels = ChatServer.Instance.GetChannels(userId);
             var data = new ServerChannelSync();
 
             data.Channels.AddRange(channels.Select(channel => new ChannelInfo
             {
-                Id = channel.id,
-                Name = channel.name,
+                Id = channel.Id,
+                Name = channel.Name,
                 IsSecret = false
             }));
 

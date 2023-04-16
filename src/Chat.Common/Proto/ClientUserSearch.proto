@@ -1,0 +1,7 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Client";
+
+message ClientUserSearch {
+	string search_term = 1;
+}
