@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reactive;
 using Avalonia.Media.Imaging;
 using Chat.Client.Data;
@@ -12,7 +13,7 @@ using ReactiveUI.Fody.Helpers;
 namespace Chat.Client.ViewModels;
 
 //TODO: https://dev.to/ingvarx/dialogs-in-avaloniaui-3pl0
-public sealed class UserInfoViewModel : DialogViewModelBase
+public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
 {
     public UserSearchResult UserInfo { get; }
 
@@ -29,6 +30,7 @@ public sealed class UserInfoViewModel : DialogViewModelBase
 
 
     private MainWindowViewModel _mainWindowViewModel;
+    private readonly MemoryStream _avatarStream;
 
 
     public UserInfoViewModel()
@@ -48,7 +50,8 @@ public sealed class UserInfoViewModel : DialogViewModelBase
         UserInfo = userInfo;
         _mainWindowViewModel = mainWindowViewModel;
 
-        if (File.Exists(userInfo.Avatar)) Avatar = new Bitmap(userInfo.Avatar);
+        _avatarStream = new MemoryStream(userInfo.Avatar);
+        Avatar = new Bitmap(_avatarStream);
         AddFriendCommand = ReactiveCommand.Create(AddFriend);
         RemoveFriendCommand = ReactiveCommand.Create(RemoveFriend);
         StartChatCommand = ReactiveCommand.Create(StartChat);
@@ -76,12 +79,20 @@ public sealed class UserInfoViewModel : DialogViewModelBase
 
     private void StartChat()
     {
-        if (!IsFriend) AddFriend();
-
         using var packet = new OutPacket(ClientHeader.ClientStartChat);
         var data = new ClientStartChat {Id = UserInfo.Id};
 
         packet.Encode(data);
         ChatClient.Instance.Send(packet);
+        _mainWindowViewModel.SearchTerm = string.Empty;
+    }
+
+    public void Dispose()
+    {
+        _avatarStream.Dispose();
+        Avatar.Dispose();
+        AddFriendCommand.Dispose();
+        RemoveFriendCommand.Dispose();
+        StartChatCommand.Dispose();
     }
 }

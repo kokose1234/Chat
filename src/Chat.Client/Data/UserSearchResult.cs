@@ -6,5 +6,5 @@ public record UserSearchResult
     public string Username { get; init; } = string.Empty;
     public string Nickname { get; init; } = string.Empty;
     public string Message { get; init; } = string.Empty;
-    public string Avatar { get; init; } = string.Empty;
+    public byte[] Avatar { get; init; } = null!;
 }

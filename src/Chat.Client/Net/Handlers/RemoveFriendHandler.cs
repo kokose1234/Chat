@@ -13,9 +13,9 @@ public class RemoveFriendHandler : AbstractHandler
     internal override Task Handle(ChatClient session, InPacket inPacket)
     {
         var request = inPacket.Decode<ServerRemoveFriend>();
-        if (session.ViewModel.Users.Any(x => x.Id == request.User.Id))
+        if (session.ViewModel.Friends.Any(x => x.Id == request.User.Id))
         {
-            session.ViewModel.Users.First(x => x.Id == request.User.Id).IsFriend = false;
+            session.ViewModel.Friends.Remove(session.ViewModel.Friends.First(x => x.Id == request.User.Id));
         }
 
         return Task.CompletedTask;

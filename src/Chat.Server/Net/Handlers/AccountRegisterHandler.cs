@@ -3,6 +3,7 @@ using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
 using Chat.Common.Packet.Data.Server;
+using Chat.Server.Data;
 using Chat.Server.Database;
 using SqlKata.Execution;
 
@@ -26,7 +27,7 @@ internal class AccountRegisterHandler : AbstractHandler
                 if (account.FirstOrDefault(x => x.registered_mac == request.MacAddress) != null)
                 {
                     packet.Encode(new ServerAccountRegister
-                        { Result = ServerAccountRegister.RegisterResult.FailDuplicateMac });
+                        {Result = ServerAccountRegister.RegisterResult.FailDuplicateMac});
                     session.Send(packet);
                     return;
                 }
@@ -34,7 +35,7 @@ internal class AccountRegisterHandler : AbstractHandler
                 if (account.FirstOrDefault(x => x.username == request.UserName) != null)
                 {
                     packet.Encode(new ServerAccountRegister
-                        { Result = ServerAccountRegister.RegisterResult.FailDuplicateUsesrname });
+                        {Result = ServerAccountRegister.RegisterResult.FailDuplicateUsesrname});
                     session.Send(packet);
                     return;
                 }
@@ -42,20 +43,21 @@ internal class AccountRegisterHandler : AbstractHandler
 
             using (var mutex = await DatabaseManager.Mutex.WriterLockAsync())
             {
-                await DatabaseManager.Factory.Query("accounts").InsertAsync(new
+                var id = await DatabaseManager.Factory.Query("accounts").InsertAsync(new
                 {
                     username = request.UserName,
                     password = request.Password,
                     registered_mac = request.MacAddress
                 });
+                ChatServer.Instance.AddUser(new User((uint) id, request.UserName, request.UserName, null, null));
             }
 
-            packet.Encode(new ServerAccountRegister { Result = ServerAccountRegister.RegisterResult.Success });
+            packet.Encode(new ServerAccountRegister {Result = ServerAccountRegister.RegisterResult.Success});
             session.Send(packet);
         }
         catch (Exception ex)
         {
-            packet.Encode(new ServerAccountRegister { Result = ServerAccountRegister.RegisterResult.FailUnkown });
+            packet.Encode(new ServerAccountRegister {Result = ServerAccountRegister.RegisterResult.FailUnkown});
             session.Send(packet);
             Console.WriteLine(ex);
         }

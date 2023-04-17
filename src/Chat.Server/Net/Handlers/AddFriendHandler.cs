@@ -8,6 +8,7 @@ using SqlKata.Execution;
 
 namespace Chat.Server.Net.Handlers;
 
+//TODO: 상대방도 친구 추가
 [PacketHandler(ClientHeader.ClientAddFriend)]
 public class AddFriendHandler : AbstractHandler
 {
@@ -25,8 +26,6 @@ public class AddFriendHandler : AbstractHandler
                 {
                     Id = account[0].id,
                     Name = account[0].name,
-                    IsFriend = true,
-                    IsMe = false
                 }
             };
 

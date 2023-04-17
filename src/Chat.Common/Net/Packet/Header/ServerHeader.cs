@@ -6,6 +6,7 @@ namespace Chat.Common.Net.Packet.Header
         ServerAccountRegister = 3515379851,
         ServerAddFriend = 2207791083,
         ServerChannelSync = 2238466440,
+        ServerCreateChannel = 1881070083,
         ServerHandshake = 23746173,
         ServerLogin = 1005611576,
         ServerMessage = 1244765267,

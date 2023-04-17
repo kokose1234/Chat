@@ -144,6 +144,7 @@ namespace Chat.Client.ViewModels
         public VideoPlayerViewModel? VideoPlayer { get; private set; }
 
         public List<UserInfo> Users { get; } = new();
+        public List<UserInfo> Friends { get; } = new();
 
         [Reactive]
         public string SearchTerm { get; set; } = string.Empty;
@@ -378,7 +379,7 @@ namespace Chat.Client.ViewModels
             {
                 var match = Users.FirstOrDefault(x => x.Id == SelectedUser.Id, null);
                 var window = new AddFriendWindow();
-                var player = new UserInfoViewModel(SelectedUser, match?.IsFriend ?? false, this);
+                var player = new UserInfoViewModel(SelectedUser, Friends.Any(x => x.Id == match.Id), this);
                 window.DataContext = player;
                 window.ShowDialog(_window);
             });

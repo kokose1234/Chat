@@ -52,4 +52,10 @@ public partial class AddFriendWindow : ReactiveWindow<UserInfoViewModel>
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         ViewModel.StartChatCommand.Execute().Subscribe();
     }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        ViewModel?.Dispose();
+    }
 }

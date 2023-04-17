@@ -8,6 +8,7 @@ using SqlKata.Execution;
 
 namespace Chat.Server.Net.Handlers;
 
+//TODO: 상대방도 친구 삭제
 [PacketHandler(ClientHeader.ClientRemoveFriend)]
 public class RemoveFriendHandler : AbstractHandler
 {
@@ -24,9 +25,7 @@ public class RemoveFriendHandler : AbstractHandler
                 User = new()
                 {
                     Id = account[0].id,
-                    Name = account[0].name,
-                    IsFriend = false,
-                    IsMe = false
+                    Name = account[0].name
                 }
             };
 

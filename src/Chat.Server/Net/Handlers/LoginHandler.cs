@@ -58,7 +58,7 @@ public class LoginHandler : AbstractHandler
 
             session.Send(packet);
 
-            ChatServer.Instance.AddClientToChannel(client);
+            ChatServer.Instance.AddClient(client);
         }
 
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
@@ -81,9 +81,7 @@ public class LoginHandler : AbstractHandler
             userList.Users.AddRange(users.DistinctBy(x => x.id).Select(user => new UserInfo
             {
                 Id = user.id,
-                Name = user.name,
-                IsFriend = friends.Any(x => x.id == user.id),
-                IsMe = user.id == userId,
+                Name = user.name
             }));
 
             packet.Encode(userList);

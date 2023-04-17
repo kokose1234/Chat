@@ -17,6 +17,7 @@ internal class ChatServer : TcpServer
     internal ConcurrentDictionary<string, ChatClient> Clients { get; } = new();
 
     private readonly ConcurrentBag<Channel> _channels = new();
+    private readonly ConcurrentBag<User> _users = new();
 
     public ChatServer(IPAddress address, int port) : base(address, port)
     {
@@ -30,14 +31,17 @@ internal class ChatServer : TcpServer
         LoadFromDatabase();
     }
 
-
     protected override TcpSession CreateSession() => new ChatSession(this);
+
+    public ChatClient GetClient(string id) => Clients[id];
 
     public IEnumerable<Channel> GetChannels(uint userId) => _channels.Where(x => x.Users.Any(y => y.Id == userId)).ToImmutableList();
 
     public Channel? GetChannel(uint channelId) => _channels.FirstOrDefault(x => x.Id == channelId, null);
 
-    public void AddClientToChannel(ChatClient client)
+    public User? GetUser(uint userId) => _users.FirstOrDefault(x => x.Id == userId, null);
+
+    public void AddClient(ChatClient client)
     {
         foreach (var channel in _channels)
         {
@@ -46,6 +50,19 @@ internal class ChatServer : TcpServer
 
             user.Client = client;
         }
+
+        foreach (var user in _users)
+        {
+            if (user.Id != client.Id) continue;
+            user.Client = client;
+            break;
+        }
+    }
+
+    public void AddUser(User user)
+    {
+        if (_users.Any(x => x.Id == user.Id)) return;
+        _users.Add(user);
     }
 
     public void RemoveClientFromChannel(ChatClient? client)
@@ -61,11 +78,40 @@ internal class ChatServer : TcpServer
         }
     }
 
+    public async Task<Channel> AddChannel(uint id)
+    {
+        using var mutex = await DatabaseManager.Mutex.ReaderLockAsync();
+        var channels = await DatabaseManager.Factory.Query("channels").Where("id", id).FirstAsync();
+        var channel = new Channel(channels.id, channels.name, channels.is_secret == 1);
+        _channels.Add(channel);
+
+        var channelUsers = await DatabaseManager.Factory.Query("channel_users").Where("channel_id", id).GetAsync();
+        foreach (var data in channelUsers)
+        {
+            var user = GetUser((uint) data.user_id);
+            if (user == null) continue;
+            var channelUser = new ChannelUser(user, data.is_admin == 1)
+            {
+                Client = user.Client
+            };
+            channel.Users.Add(channelUser);
+        }
+
+        return channel;
+    }
+
     private async void LoadFromDatabase()
     {
         using var mutex = await DatabaseManager.Mutex.ReaderLockAsync();
         using var packet = new OutPacket(ServerHeader.ServerLogin);
+        var accounts = await DatabaseManager.Factory.Query("accounts").GetAsync();
         var channels = await DatabaseManager.Factory.Query("channels").GetAsync();
+
+        foreach (var account in accounts)
+        {
+            var user = new User(account.id, account.username, account.name, account.message, account.avatar);
+            _users.Add(user);
+        }
 
         foreach (var data in channels)
         {
@@ -74,10 +120,13 @@ internal class ChatServer : TcpServer
         }
 
         var channelUsers = await DatabaseManager.Factory.Query("channel_users").GetAsync();
-        foreach (var user in channelUsers)
+        foreach (var data in channelUsers)
         {
-            var channel = GetChannel((uint) user.channel_id);
-            channel?.Users.Add(new ChannelUser((uint) user.user_id, user.is_admin == 1));
+            var channel = GetChannel((uint) data.channel_id);
+            var user = GetUser((uint) data.user_id);
+            if (user == null) continue;
+            var channelUser = new ChannelUser(user, data.is_admin == 1);
+            channel?.Users.Add(channelUser);
         }
     }
 }

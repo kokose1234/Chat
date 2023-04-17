@@ -3,5 +3,5 @@
 option csharp_namespace = "Chat.Common.Packet.Data.Client";
 
 message ClientStartChat {
-	uint64 id = 1;
+	uint32 id = 1;
 }

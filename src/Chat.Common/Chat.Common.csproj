@@ -24,6 +24,7 @@
     <None Remove="Proto\Data\UserInfo.proto" />
     <None Remove="Proto\ServerAddFriend.proto" />
     <None Remove="Proto\ServerChannelSync.proto" />
+    <None Remove="Proto\ServerCreateChannel.proto" />
     <None Remove="Proto\ServerMessage.proto" />
     <None Remove="Proto\ServerMessageSync.proto" />
     <None Remove="Proto\ServerRemoveFriend.proto" />
@@ -35,6 +36,7 @@
 
   <ItemGroup>
     <AdditionalFiles Include="Proto\ClientAccountRegister.proto" />
+    <AdditionalFiles Include="Proto\ServerCreateChannel.proto" />
     <AdditionalFiles Include="Proto\ServerRemoveFriend.proto" />
     <AdditionalFiles Include="Proto\ServerAddFriend.proto" />
     <AdditionalFiles Include="Proto\ClientStartChat.proto" />

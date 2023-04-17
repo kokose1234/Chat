@@ -1,0 +1,11 @@
+﻿syntax = "proto3";
+
+import "Data/ChannelInfo.proto";
+import "Data/UserInfo.proto";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Server";
+
+message ServerCreateChannel {
+	ChannelInfo channel = 1;
+	repeated UserInfo users = 2;
+}
