@@ -10,5 +10,6 @@ namespace Chat.Client.ViewModels
         {
             Activator = new ViewModelActivator();
         }
+
     }
 }

@@ -54,7 +54,7 @@ namespace Chat.Client.ViewModels
         public IObservableCollection<Channel> Channels { get; } = new ObservableCollectionExtended<Channel>();
         public IObservableCollection<UserSearchResult> SearchUsers { get; } = new ObservableCollectionExtended<UserSearchResult>();
         public IObservableCollection<ChatMessage> Messages { get; } = new ObservableCollectionExtended<ChatMessage>();
-        public IObservableCollection<ChatMessage> CurrentMessages { get; } = new ObservableCollectionExtended<ChatMessage>();
+        public IObservableCollection<MessageViewModel> CurrentMessages { get; } = new ObservableCollectionExtended<MessageViewModel>();
 
         [Reactive]
         public Channel? SelectedChannel { get; set; }
@@ -145,6 +145,7 @@ namespace Chat.Client.ViewModels
 
         public List<UserInfo> Users { get; } = new();
         public List<UserInfo> Friends { get; } = new();
+        public uint UserId { get; set; }
 
         [Reactive]
         public string SearchTerm { get; set; } = string.Empty;
@@ -180,7 +181,7 @@ namespace Chat.Client.ViewModels
                     if (channel != null)
                     {
                         CurrentMessages.Clear();
-                        CurrentMessages.AddRange(Messages.Where(m => m.ChannelId == channel.Id));
+                        CurrentMessages.AddRange(Messages.Where(m => m.ChannelId == channel.Id).Select(x => new MessageViewModel(x.SenderName, x.Message, x.Time.ToString("yyyy-MM-dd tt h:mm"), x.SenderId == UserId)));
                     }
                 });
 
@@ -236,7 +237,7 @@ namespace Chat.Client.ViewModels
 
             if (SelectedChannel != null && SelectedChannel.Id == message.ChannelId)
             {
-                CurrentMessages.Add(msg);
+                CurrentMessages.Add(new MessageViewModel(msg.SenderName, msg.Message, msg.Time.ToString("yyyy-MM-dd tt h:mm"), msg.SenderId == UserId));
             }
         }
 

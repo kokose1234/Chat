@@ -134,5 +134,10 @@ namespace Chat.Client.Views
         {
             ViewModel?.OpenUserInfoCommand.Execute().Subscribe();
         }
+
+        private void ChatScrollViewer_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            ChatScrollViewer?.ScrollToEnd();
+        }
     }
 }

@@ -19,6 +19,7 @@ internal class LoginHandler : AbstractHandler
         {
             case ServerLogin.LoginResult.Success:
             {
+                session.ViewModel.UserId = data.Id;
                 session.ViewModel.IsLogined = true;
                 break;
             }

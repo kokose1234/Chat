@@ -30,6 +30,7 @@
 
     <Window.Resources>
         <conv:TimeConverter x:Key="timeConverter" />
+        <conv:MessagePositionConverter x:Key="messageConverter" />
     </Window.Resources>
 
     <Window.Styles>
@@ -141,7 +142,8 @@
                                 <StackPanel Name="UserInfoItem" HorizontalAlignment="Stretch">
                                     <StackPanel.ContextMenu>
                                         <ContextMenu Name="UserInfoContextMenu" PlacementMode="Pointer">
-                                            <MenuItem Name="ShowUserInfo" Header="정보 보기" PointerPressed="ShowUserInfo_OnPointerPressed">
+                                            <MenuItem Name="ShowUserInfo" Header="정보 보기"
+                                                      PointerPressed="ShowUserInfo_OnPointerPressed">
                                                 <MenuItem.Icon>
                                                     <Image Source="/Assets/Icons/info.png" />
                                                 </MenuItem.Icon>
@@ -183,17 +185,14 @@
                                 VerticalAlignment="Center" Margin="10,0" Padding="0,0,0,20" />
                     </WrapPanel>
                 </Grid>
-                <ScrollViewer Grid.Row="1"
-                              IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ScrollViewer Grid.Row="1" x:Name="ChatScrollViewer" IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
                     <StackPanel Background="#0E1621">
-                        <ItemsControl Items="{Binding CurrentMessages}">
+                        <ItemsControl Items="{Binding CurrentMessages}" PropertyChanged="ChatScrollViewer_OnPropertyChanged">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <WrapPanel HorizontalAlignment="Left">
-                                        <TextBlock Text="{Binding SenderName}" />
-                                        <TextBlock Text=" : " />
-                                        <TextBlock Text="{Binding Message}" />
-                                    </WrapPanel>
+                                    <v:ChatMessage x:Name="ChatMessage" Margin="10,5"
+                                                   HorizontalAlignment="{Binding Converter={StaticResource messageConverter}}"
+                                                   DataContext="{Binding}" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -206,8 +205,7 @@
                         <Image Name="AttachImage" Source="/Assets/Buttons/attach.png"
                                PointerPressed="AttachImage_OnPointerPressed" />
                     </Grid>
-                    <TextBox Grid.Column="1" Margin="3" BorderThickness="0" Background="#17212B"
-                             Text="{Binding ChatMessage}">
+                    <TextBox Grid.Column="1" BorderThickness="0" Background="#17212B" Text="{Binding ChatMessage}">
                         <TextBox.KeyBindings>
                             <KeyBinding Gesture="Enter" Command="{Binding SendMessageCommand}" />
                         </TextBox.KeyBindings>
