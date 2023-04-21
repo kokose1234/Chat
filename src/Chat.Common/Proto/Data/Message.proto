@@ -10,6 +10,6 @@ message Message {
   uint32 channel_id = 2;
   uint32 sender = 3;
   google.protobuf.Timestamp date = 4;
-  string text = 5;
-  bytes attachment = 6;
+  bytes text = 5;
+  optional bytes attachment = 6;
 }

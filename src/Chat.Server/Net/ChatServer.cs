@@ -41,6 +41,8 @@ internal class ChatServer : TcpServer
 
     public User? GetUser(uint userId) => _users.FirstOrDefault(x => x.Id == userId, null);
 
+    public List<User> GetUsers(uint[] ids) => _users.Where(x => ids.Contains(x.Id)).ToList();
+
     public void AddClient(ChatClient client)
     {
         foreach (var channel in _channels)

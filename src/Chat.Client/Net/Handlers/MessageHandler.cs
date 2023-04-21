@@ -1,5 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Chat.Client.Data.Types;
+using Chat.Client.Tools;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
@@ -10,31 +14,66 @@ namespace Chat.Client.Net.Handlers;
 [PacketHandler(ServerHeader.ServerMessage)]
 public class MessageHandler : AbstractHandler
 {
+    private readonly Queue<ServerMessage> _queue = new();
+
     internal override Task Handle(ChatClient session, InPacket inPacket)
     {
         var data = inPacket.Decode<ServerMessage>();
-        if (data.Message.Attachment == null)
+        var channel = session.ViewModel.Channels.FirstOrDefault(x => x.Id == data.Message.ChannelId);
+        if (channel == null) return Task.CompletedTask;
+
+        if (channel is {IsSecret: true, Key.Length: 0})
         {
-            session.ViewModel.AddMessage(data.Message);
+            _queue.Enqueue(data);
             return Task.CompletedTask;
         }
 
-        var fileData = new byte[data.Message.Attachment.Length - 1];
-        var fileName = data.Message.Text;
-        System.Buffer.BlockCopy(data.Message.Attachment, 1, fileData, 0, fileData.Length);
+        _queue.Enqueue(data);
 
-        switch ((AttachmentType) data.Message.Attachment[0])
+        while (_queue.Count > 0)
         {
-            case AttachmentType.Music:
-                data.Message.Text = $"{data.Message.Text} 재생";
-                session.ViewModel.AddMessage(data.Message);
-                session.ViewModel.PlayMusic(fileData);
-                break;
-            case AttachmentType.Video:
-                data.Message.Text = $"{data.Message.Text} 재생";
-                session.ViewModel.AddMessage(data.Message);
-                session.ViewModel.PlayVideo(fileName, fileData);
-                break;
+            var message = _queue.Dequeue();
+            channel = session.ViewModel.Channels.FirstOrDefault(x => x.Id == message.Message.ChannelId);
+            if (channel == null) return Task.CompletedTask;
+
+            if (channel is {IsSecret: true, Key.Length: 0})
+            {
+                _queue.Enqueue(message);
+                return Task.CompletedTask;
+            }
+
+            if (channel.IsSecret)
+            {
+                message.Message.Text = Util.Decrypt(message.Message.Text, channel.Key);
+                message.Message.Attachment = Util.Decrypt(message.Message.Attachment, channel.Key);
+            }
+
+            if (message.Message.Attachment == null)
+            {
+                session.ViewModel.AddMessage(message.Message);
+                return Task.CompletedTask;
+            }
+
+            var fileData = new byte[message.Message.Attachment.Length - 1];
+            var fileName = Encoding.UTF8.GetString(message.Message.Text);
+            System.Buffer.BlockCopy(message.Message.Attachment, 1, fileData, 0, fileData.Length);
+
+            switch ((AttachmentType) message.Message.Attachment[0])
+            {
+                case AttachmentType.Image:
+                    //TODO: AddPicture
+                    break;
+                case AttachmentType.Music:
+                    message.Message.Text = Encoding.UTF8.GetBytes($"{fileName} 재생"); //TODO: 엄준식임
+                    session.ViewModel.AddMessage(message.Message);
+                    session.ViewModel.PlayMusic(fileData);
+                    break;
+                case AttachmentType.Video:
+                    message.Message.Text = Encoding.UTF8.GetBytes($"{fileName} 재생");
+                    session.ViewModel.AddMessage(message.Message);
+                    session.ViewModel.PlayVideo(fileName, fileData);
+                    break;
+            }
         }
 
         return Task.CompletedTask;

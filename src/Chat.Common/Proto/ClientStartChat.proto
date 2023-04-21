@@ -3,5 +3,7 @@
 option csharp_namespace = "Chat.Common.Packet.Data.Client";
 
 message ClientStartChat {
-	uint32 id = 1;
+	repeated uint32 user_ids = 1;
+	bool is_secret = 2;
+	optional string name = 3;
 }

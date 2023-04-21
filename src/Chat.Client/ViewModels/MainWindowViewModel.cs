@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Text;
 using System.Windows.Forms;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -194,6 +195,8 @@ namespace Chat.Client.ViewModels
 
         private void Login()
         {
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password)) return;
+
             using var packet = new OutPacket(ClientHeader.ClientLogin);
             var request = new ClientLogin
             {
@@ -208,6 +211,8 @@ namespace Chat.Client.ViewModels
 
         private void Register()
         {
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password)) return;
+
             using var packet = new OutPacket(ClientHeader.ClientAccountRegister);
             var request = new ClientLogin
             {
@@ -220,17 +225,19 @@ namespace Chat.Client.ViewModels
             ChatClient.Instance.Send(packet);
         }
 
+
         public void AddMessage(Message message)
         {
+            var text = Encoding.UTF8.GetString(message.Text);
             var msg = new ChatMessage
             {
-                // Id = message.Id,
+                Id = message.Id,
                 ChannelId = message.ChannelId,
                 SenderId = message.Sender,
-                Message = message.Text,
+                Message = text,
                 Time = message.Date ?? DateTime.Now
             };
-            Channels.First(x => x.Id == message.ChannelId).Description = message.Text;
+            Channels.First(x => x.Id == message.ChannelId).Description = text;
             msg.SenderName = Users.First(x => x.Id == message.Sender).Name;
 
             Messages.Add(msg);
@@ -286,13 +293,20 @@ namespace Chat.Client.ViewModels
 
         private void SendMessage()
         {
+            if (SelectedChannel == null) return;
+            if (SelectedChannel.IsSecret && SelectedChannel.Key.Length == 0)
+            {
+                //TODO: Message
+                return;
+            }
+
             if (!string.IsNullOrWhiteSpace(ChatMessage) && SelectedChannel != null)
             {
                 using var packet = new OutPacket(ClientHeader.ClientMessage);
                 var request = new ClientMessage
                 {
                     Channel = SelectedChannel.Id,
-                    Message = ChatMessage,
+                    Message = Util.Encrypt(Encoding.UTF8.GetBytes(ChatMessage), SelectedChannel.Key)
                 };
                 packet.Encode(request);
                 ChatClient.Instance.Send(packet);
@@ -304,10 +318,15 @@ namespace Chat.Client.ViewModels
         private void Attach()
         {
             if (SelectedChannel == null) return;
+            if (SelectedChannel.IsSecret && SelectedChannel.Key.Length == 0)
+            {
+                //TODO: Message
+                return;
+            }
 
             using var ofd = new OpenFileDialog
             {
-                Filter = "음악 파일 (*.mp3)|*.mp3|영상 파일 (*.mp4)|*.mp4",
+                Filter = "음악 파일 (*.mp3)|*.mp3|영상 파일 (*.mp4)|*.mp4|이미지 파일 (*.png, *.jpg, *.jpeg)|*.png;*.jpg;*.jpeg",
                 Multiselect = false,
                 CheckFileExists = true,
                 CheckPathExists = true,
@@ -331,6 +350,8 @@ namespace Chat.Client.ViewModels
             data[0] = Path.GetExtension(ofd.FileName) switch
             {
                 ".png" => (byte) AttachmentType.Image,
+                ".jpg" => (byte) AttachmentType.Image,
+                ".jpeg" => (byte) AttachmentType.Image,
                 ".mp3" => (byte) AttachmentType.Music,
                 ".mp4" => (byte) AttachmentType.Video,
                 _ => (byte) AttachmentType.Etc
@@ -338,13 +359,29 @@ namespace Chat.Client.ViewModels
 
             Buffer.BlockCopy(file, 0, data, 1, file.Length);
 
-            var request = new ClientMessage
+            if (SelectedChannel.IsSecret)
             {
-                Channel = SelectedChannel.Id,
-                Message = Path.GetFileName(ofd.FileName),
-                Attachment = data,
-            };
-            packet.Encode(request);
+                var encryptedData = Util.Encrypt(data, SelectedChannel.Key);
+                var encryptedMessage = Util.Encrypt(Encoding.UTF8.GetBytes(Path.GetFileName(ofd.FileName)), SelectedChannel.Key);
+                var request = new ClientMessage
+                {
+                    Channel = SelectedChannel.Id,
+                    Message = encryptedMessage,
+                    Attachment = encryptedData,
+                };
+                packet.Encode(request);
+            }
+            else
+            {
+                var request = new ClientMessage
+                {
+                    Channel = SelectedChannel.Id,
+                    Message = Encoding.UTF8.GetBytes(Path.GetFileName(ofd.FileName)),
+                    Attachment = data,
+                };
+                packet.Encode(request);
+            }
+
             ChatClient.Instance.Send(packet);
         }
 

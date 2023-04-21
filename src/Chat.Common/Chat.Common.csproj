@@ -68,18 +68,15 @@
 
   <ItemGroup>
     <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
-    <PackageReference Include="BlowFish" Version="1.0.2" />
     <PackageReference Include="FastEnum" Version="1.8.0" />
     <PackageReference Include="Google.Protobuf" Version="3.22.3" />
     <PackageReference Include="NetCoreServer" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.1.3" />
     <PackageReference Include="protobuf-net" Version="3.2.16" />
     <PackageReference Include="protobuf-net.BuildTools" Version="3.2.12">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SharpZipLib" Version="1.4.2" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">

@@ -32,7 +32,8 @@ public class LoginHandler : AbstractHandler
                 return;
             }
 
-            if (account[0].password != request.Password)
+            
+            if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account[0].password))
             {
                 packet.Encode(new ServerLogin {Result = ServerLogin.LoginResult.FailedWrongInfo});
                 session.Send(packet);
@@ -97,7 +98,7 @@ public class LoginHandler : AbstractHandler
             {
                 Id = channel.Id,
                 Name = channel.Name,
-                IsSecret = false
+                IsSecret = channel.IsSecret
             }));
 
             packet.Encode(data);

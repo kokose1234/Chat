@@ -4,6 +4,7 @@ using System.Reactive;
 using Avalonia.Media.Imaging;
 using Chat.Client.Data;
 using Chat.Client.Net;
+using Chat.Client.Tools;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
@@ -12,7 +13,6 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Chat.Client.ViewModels;
 
-//TODO: https://dev.to/ingvarx/dialogs-in-avaloniaui-3pl0
 public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
 {
     public UserSearchResult UserInfo { get; }
@@ -29,7 +29,7 @@ public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
     public ReactiveCommand<Unit, Unit> StartChatCommand { get; }
 
 
-    private MainWindowViewModel _mainWindowViewModel;
+    private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly MemoryStream _avatarStream;
 
 
@@ -80,7 +80,12 @@ public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
     private void StartChat()
     {
         using var packet = new OutPacket(ClientHeader.ClientStartChat);
-        var data = new ClientStartChat {Id = UserInfo.Id};
+        var data = new ClientStartChat
+        {
+            UserIds = new[] {UserInfo.Id},
+            IsSecret = true,
+            Name = null
+        };
 
         packet.Encode(data);
         ChatClient.Instance.Send(packet);

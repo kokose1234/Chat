@@ -46,7 +46,7 @@ internal class AccountRegisterHandler : AbstractHandler
                 var id = await DatabaseManager.Factory.Query("accounts").InsertAsync(new
                 {
                     username = request.UserName,
-                    password = request.Password,
+                    password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password),
                     registered_mac = request.MacAddress
                 });
                 ChatServer.Instance.AddUser(new User((uint) id, request.UserName, request.UserName, null, null));
