@@ -11,6 +11,8 @@ namespace Chat.Common.Net.Packet.Header
         ClientMessageSync = 3009919302,
         ClientPong = 2767742975,
         ClientRemoveFriend = 2136221031,
+        ClientRequestKey = 1748801891,
+        ClientResponseKey = 1951363117,
         ClientStartChat = 2394788432,
         ClientSyncMusic = 158472322,
         ClientSyncVideo = 3102204132,

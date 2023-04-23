@@ -297,6 +297,7 @@ namespace Chat.Client.ViewModels
             if (SelectedChannel.IsSecret && SelectedChannel.Key.Length == 0)
             {
                 //TODO: Message
+                ChatMessage = string.Empty;
                 return;
             }
 

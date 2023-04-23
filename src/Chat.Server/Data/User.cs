@@ -42,8 +42,14 @@ public class User : ISavableObject
         Client?.Session.Send(packet, dispose);
     }
 
+
     public void Save()
     {
-        throw new NotImplementedException();
+  
+    }
+
+    public virtual void OnDisconnected()
+    {
+        Client = null;
     }
 }

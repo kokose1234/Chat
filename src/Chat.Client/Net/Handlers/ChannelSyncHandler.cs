@@ -5,6 +5,7 @@ using Chat.Client.Models;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
+using Chat.Common.Packet.Data.Client;
 using Chat.Common.Packet.Data.Server;
 using LiteDB;
 
@@ -40,7 +41,7 @@ public class ChannelSyncHandler : AbstractHandler
                     ChannelId = channel.Id
                 };
                 repo.AddChannel(result);
-                RequestKey();
+                RequestKey(channel.Id, session);
             }
             else
             {
@@ -52,7 +53,7 @@ public class ChannelSyncHandler : AbstractHandler
                     }
                     else
                     {
-                        RequestKey();
+                        RequestKey(channel.Id, session);
                     }
                 }
             }
@@ -61,5 +62,10 @@ public class ChannelSyncHandler : AbstractHandler
         }
     }
 
-    private void RequestKey() { }
+    private void RequestKey(uint id, ChatClient client)
+    {
+        using var packet = new OutPacket(ClientHeader.ClientRequestKey);
+        packet.Encode<ClientRequestKey>(new() {Channel = id});
+        client.Send(packet);
+    }
 }

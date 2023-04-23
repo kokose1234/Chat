@@ -32,7 +32,7 @@ public class LoginHandler : AbstractHandler
                 return;
             }
 
-            
+
             if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account[0].password))
             {
                 packet.Encode(new ServerLogin {Result = ServerLogin.LoginResult.FailedWrongInfo});
@@ -65,11 +65,19 @@ public class LoginHandler : AbstractHandler
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
             using var packet = new OutPacket(ServerHeader.ServerUserList);
-            var channelUsers = await DatabaseManager.Factory.Query("accounts")
-                                                    .Join("channel_users", "accounts.id", "channel_users.user_id")
-                                                    .Where("channel_users.user_id", userId)
-                                                    .Distinct()
-                                                    .GetAsync();
+            // var channelUsers = await DatabaseManager.Factory.Query("accounts")
+            //                                         .Join("channel_users", "accounts.id", "channel_users.user_id")
+            //                                         .Where("channel_users.user_id", userId)
+            //                                         .Distinct()
+            //                                         .GetAsync();
+            var channels = ChatServer.Instance.GetChannels(userId);
+            var channelUsers = channels.SelectMany(x => x.Users)
+                                       .DistinctBy(x => x.Id)
+                                       .Select(x => new
+                                       {
+                                           id = x.Id,
+                                           name = x.Nickname
+                                       });
             var friends = (await DatabaseManager.Factory.Query("accounts")
                                                 .Join("friends", "accounts.id", "friends.friend_user_id")
                                                 .Where("friends.user_id", userId)
@@ -103,6 +111,22 @@ public class LoginHandler : AbstractHandler
 
             packet.Encode(data);
             session.Send(packet);
+        }
+
+        {
+            var channels = ChatServer.Instance.GetChannels(userId);
+            foreach (var channel in channels)
+            {
+                if (!channel.IsSecret) continue;
+                if (channel.GetUser(userId) == null) continue;
+
+                if (channel.Users.Where(x => x.Id != userId && x.Client != null).Any(x => x.KeyRequested))
+                {
+                    using var packet = new OutPacket(ServerHeader.ServerRequestKey);
+                    packet.Encode(new ServerRequestKey {Channel = channel.Id});
+                    session.Send(packet);
+                }
+            }
         }
     }
 }

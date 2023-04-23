@@ -25,7 +25,7 @@ public class StartChatHandler : AbstractHandler
 
         using var packet = new OutPacket(ServerHeader.ServerCreateChannel);
         var data = new ServerCreateChannel();
-        var channelName = request.Name ?? string.Join(", ", users.Select(x => x.Nickname));
+        var channelName = string.IsNullOrEmpty(request.Name) ? string.Join(", ", users.Select(x => x.Nickname)) : request.Name;
         var key = request.IsSecret ? Util.GetRandomBytes(32) : null;
         uint id;
 

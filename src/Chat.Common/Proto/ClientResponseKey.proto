@@ -1,0 +1,8 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Client";
+
+message ClientResponseKey {
+	uint32 channel = 1;
+	bytes key = 2;
+}

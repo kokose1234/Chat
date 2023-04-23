@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Chat.Client.Data.Types;
+using Chat.Client.Database;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
@@ -21,6 +22,7 @@ internal class LoginHandler : AbstractHandler
             {
                 session.ViewModel.UserId = data.Id;
                 session.ViewModel.IsLogined = true;
+                DatabaseManager.Setup(data.Id.ToString());
                 break;
             }
             case ServerLogin.LoginResult.FailedDuplicateUser:

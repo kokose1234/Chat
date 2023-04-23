@@ -57,6 +57,7 @@ public class ChatSession : TcpSession
     {
         ChatServer.Instance.Clients.TryRemove(Id.ToString(), out _);
         ChatServer.Instance.RemoveClientFromChannel(Client);
+        Client.OnDisconnected();
 
         Console.WriteLine($"{_remoteEndpoint}가 연결 해제됨");
     }

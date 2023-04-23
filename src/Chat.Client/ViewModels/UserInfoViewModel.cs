@@ -50,6 +50,9 @@ public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
         UserInfo = userInfo;
         _mainWindowViewModel = mainWindowViewModel;
 
+#if DEBUG
+        userInfo.Avatar ??= File.ReadAllBytes("./1.png");
+#endif
         _avatarStream = new MemoryStream(userInfo.Avatar);
         Avatar = new Bitmap(_avatarStream);
         AddFriendCommand = ReactiveCommand.Create(AddFriend);
@@ -79,6 +82,8 @@ public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
 
     private void StartChat()
     {
+        // if (!IsFriend) AddFriend();
+
         using var packet = new OutPacket(ClientHeader.ClientStartChat);
         var data = new ClientStartChat
         {

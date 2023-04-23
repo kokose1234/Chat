@@ -15,6 +15,8 @@
     <None Remove="Proto\ClientMessage.proto" />
     <None Remove="Proto\ClientMessageSync.proto" />
     <None Remove="Proto\ClientRemoveFriend.proto" />
+    <None Remove="Proto\ClientRequestKey.proto" />
+    <None Remove="Proto\ClientResponseKey.proto" />
     <None Remove="Proto\ClientStartChat.proto" />
     <None Remove="Proto\ClientSyncMusic.proto" />
     <None Remove="Proto\ClientSyncVideo.proto" />
@@ -25,9 +27,11 @@
     <None Remove="Proto\ServerAddFriend.proto" />
     <None Remove="Proto\ServerChannelSync.proto" />
     <None Remove="Proto\ServerCreateChannel.proto" />
+    <None Remove="Proto\ServerDeliverKey.proto" />
     <None Remove="Proto\ServerMessage.proto" />
     <None Remove="Proto\ServerMessageSync.proto" />
     <None Remove="Proto\ServerRemoveFriend.proto" />
+    <None Remove="Proto\ServerRequestKey.proto" />
     <None Remove="Proto\ServerSyncMusic.proto" />
     <None Remove="Proto\ServerSyncVideo.proto" />
     <None Remove="Proto\ServerUserList.proto" />
@@ -36,6 +40,10 @@
 
   <ItemGroup>
     <AdditionalFiles Include="Proto\ClientAccountRegister.proto" />
+    <AdditionalFiles Include="Proto\ServerDeliverKey.proto" />
+    <AdditionalFiles Include="Proto\ClientResponseKey.proto" />
+    <AdditionalFiles Include="Proto\ServerRequestKey.proto" />
+    <AdditionalFiles Include="Proto\ClientRequestKey.proto" />
     <AdditionalFiles Include="Proto\ServerCreateChannel.proto" />
     <AdditionalFiles Include="Proto\ServerRemoveFriend.proto" />
     <AdditionalFiles Include="Proto\ServerAddFriend.proto" />

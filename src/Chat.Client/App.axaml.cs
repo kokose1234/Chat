@@ -1,11 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Chat.Client.Database;
 using Chat.Client.Net;
 using Chat.Client.Tools;
 using Chat.Client.ViewModels;
@@ -20,7 +20,6 @@ namespace Chat.Client
     {
         public override void Initialize()
         {
-            DatabaseManager.Setup();
             _ = ChatClient.Instance;
             Console.Title = $"Chat Client - {Constants.Version}";
             PacketHandlers.RegisterPackets();
@@ -46,6 +45,7 @@ namespace Chat.Client
         }
 
 #if DEBUG
+        [SuppressMessage("ReSharper", "FunctionNeverReturns")]
         private static void ProcessCommand()
         {
             while (true)

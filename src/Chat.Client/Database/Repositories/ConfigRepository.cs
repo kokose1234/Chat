@@ -5,7 +5,7 @@ namespace Chat.Client.Database.Repositories;
 
 public class ConfigRepository : RepositoryBase<ConfigEntity>
 {
-    public ConfigRepository() : base("config")
+    public ConfigRepository(string id) : base(id, "config")
     {
         var config = Collection.FindOne(Query.All());
         if (config == null)

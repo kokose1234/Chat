@@ -6,7 +6,7 @@ using Chat.Server.Data;
 
 namespace Chat.Server.Net;
 
-public class ChatClient: ISavableObject
+public class ChatClient : ISavableObject
 {
     public long LastPongTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
     public int LastPingKey { get; set; }
@@ -44,8 +44,28 @@ public class ChatClient: ISavableObject
         Console.WriteLine($"[S] Ping: {ping.Key}");
     }
 
-    public void Save()
+    public void Save() { }
+
+    public void OnDisconnected()
     {
-        throw new NotImplementedException();
+        var user = ChatServer.Instance.GetUser(Id);
+        var channels = ChatServer.Instance.GetChannels(Id);
+
+        if (user != null)
+        {
+            user.Save();
+            user.OnDisconnected();
+        }
+
+        foreach (var channel in channels)
+        {
+            foreach (var channelUser in channel.Users)
+            {
+                channelUser.Save();
+                channelUser.OnDisconnected();
+            }
+        }
+
+        _pingTimer.Dispose();
     }
 }

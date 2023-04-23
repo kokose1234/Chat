@@ -11,12 +11,12 @@ public static class DatabaseManager
 
     private static readonly Dictionary<Type, IRepository> Repositories = new();
 
-    public static void Setup()
+    public static void Setup(string id)
     {
-        if (!Directory.Exists("./Database")) Directory.CreateDirectory("./Database");
+        if (!Directory.Exists($"./Database/{id}")) Directory.CreateDirectory($"./Database/{id}");
 
-        Repositories.Add(typeof(ConfigRepository), new ConfigRepository());
-        Repositories.Add(typeof(ChannelRepository), new ChannelRepository());
+        Repositories.Add(typeof(ConfigRepository), new ConfigRepository(id));
+        Repositories.Add(typeof(ChannelRepository), new ChannelRepository(id));
 
 
         IsInitialized = true;

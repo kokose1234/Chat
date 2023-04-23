@@ -14,9 +14,9 @@ public abstract class RepositoryBase<T> : IDisposable, IRepository where T : Ent
 
     protected ILiteCollection<T> Collection { get; }
 
-    protected RepositoryBase(string name)
+    protected RepositoryBase(string id, string name)
     {
-        Database = new($"Filename=./Database/{name}.db;Password=baba1234;Upgrade=true");
+        Database = new($"Filename=./Database/{id}/{name}.db;Password=baba1234;Upgrade=true");
         Collection = Database.GetCollection<T>();
     }
 

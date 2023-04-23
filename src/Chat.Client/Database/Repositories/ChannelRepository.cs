@@ -4,7 +4,7 @@ namespace Chat.Client.Database.Repositories;
 
 public class ChannelRepository : RepositoryBase<ChannelEntity>
 {
-    public ChannelRepository() : base("channel") { }
+    public ChannelRepository(string id) : base(id, "channel") { }
 
     public ChannelEntity? GetChannel(uint id)
     {

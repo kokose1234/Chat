@@ -65,6 +65,17 @@ public sealed class Channel : ISavableObject
         packet.Dispose();
     }
 
+    public void Broadcast(OutPacket packet, uint except)
+    {
+        foreach (var user in Users)
+        {
+            if (user.Id == except) continue;
+            user.Send(packet, false);
+        }
+
+        packet.Dispose();
+    }
+
     public void Save()
     {
         throw new NotImplementedException();

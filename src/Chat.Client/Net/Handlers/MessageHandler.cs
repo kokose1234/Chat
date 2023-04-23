@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
+using Chat.Common.Tools;
 
 namespace Chat.Client.Net.Handlers;
 
@@ -45,7 +47,7 @@ public class MessageHandler : AbstractHandler
             if (channel.IsSecret)
             {
                 message.Message.Text = Util.Decrypt(message.Message.Text, channel.Key);
-                message.Message.Attachment = Util.Decrypt(message.Message.Attachment, channel.Key);
+                if (message.Message.Attachment != null) message.Message.Attachment = Util.Decrypt(message.Message.Attachment, channel.Key);
             }
 
             if (message.Message.Attachment == null)
