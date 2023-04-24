@@ -3,8 +3,9 @@ using System.IO;
 using System.Reactive;
 using Avalonia.Media.Imaging;
 using Chat.Client.Data;
+using Chat.Client.Database;
+using Chat.Client.Database.Repositories;
 using Chat.Client.Net;
-using Chat.Client.Tools;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
@@ -28,7 +29,6 @@ public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
 
     public ReactiveCommand<Unit, Unit> StartChatCommand { get; }
 
-
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly MemoryStream _avatarStream;
 
@@ -49,15 +49,18 @@ public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
         IsFriend = isFriend;
         UserInfo = userInfo;
         _mainWindowViewModel = mainWindowViewModel;
-
-#if DEBUG
-        userInfo.Avatar ??= File.ReadAllBytes("./1.png");
-#endif
-        _avatarStream = new MemoryStream(userInfo.Avatar);
-        Avatar = new Bitmap(_avatarStream);
         AddFriendCommand = ReactiveCommand.Create(AddFriend);
         RemoveFriendCommand = ReactiveCommand.Create(RemoveFriend);
         StartChatCommand = ReactiveCommand.Create(StartChat);
+
+        var repo = DatabaseManager.GetRepository<ImageRepository>();
+        using var mutex = repo.Mutex.ReaderLock();
+        using var tempStream = new MemoryStream();
+        repo.GetProfileImage(userInfo.Id, tempStream);
+
+        var data = tempStream.ToArray();
+        _avatarStream = new MemoryStream(data);
+        Avatar = new Bitmap(_avatarStream);
     }
 
     private void AddFriend()
@@ -82,8 +85,6 @@ public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
 
     private void StartChat()
     {
-        // if (!IsFriend) AddFriend();
-
         using var packet = new OutPacket(ClientHeader.ClientStartChat);
         var data = new ClientStartChat
         {

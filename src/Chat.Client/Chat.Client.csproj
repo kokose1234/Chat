@@ -52,7 +52,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Database\Entities\" />
     <Folder Include="Data\DialogResults\" />
     <Folder Include="Data\Types\" />
   </ItemGroup>

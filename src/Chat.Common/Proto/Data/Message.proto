@@ -3,7 +3,6 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 
 option csharp_namespace = "Chat.Common.Data";
-option optimize_for = CODE_SIZE;
 
 message Message {
   uint32 id = 1;

@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 option csharp_namespace = "Chat.Common.Packet.Data.Client";
-option optimize_for = CODE_SIZE;
 
 message ClientMessage {
 	uint32 channel = 1;

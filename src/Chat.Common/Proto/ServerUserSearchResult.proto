@@ -9,6 +9,6 @@ message ServerUserSearchResult {
 		string username = 1;
 		string nickname = 2;
 		string message = 3;
-		optional bytes avatar = 4;
+		uint64 last_avatar_update = 4;
 	}
 }

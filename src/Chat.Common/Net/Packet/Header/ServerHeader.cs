@@ -15,6 +15,7 @@ namespace Chat.Common.Net.Packet.Header
         ServerPing = 3105391283,
         ServerRemoveFriend = 914356615,
         ServerRequestKey = 1091113802,
+        ServerResponseImage = 730883383,
         ServerSyncMusic = 3845237243,
         ServerSyncVideo = 1420054941,
         ServerUserList = 1889783576,

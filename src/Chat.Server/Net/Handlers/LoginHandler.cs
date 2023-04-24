@@ -65,11 +65,6 @@ public class LoginHandler : AbstractHandler
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
             using var packet = new OutPacket(ServerHeader.ServerUserList);
-            // var channelUsers = await DatabaseManager.Factory.Query("accounts")
-            //                                         .Join("channel_users", "accounts.id", "channel_users.user_id")
-            //                                         .Where("channel_users.user_id", userId)
-            //                                         .Distinct()
-            //                                         .GetAsync();
             var channels = ChatServer.Instance.GetChannels(userId);
             var channelUsers = channels.SelectMany(x => x.Users)
                                        .DistinctBy(x => x.Id)

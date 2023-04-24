@@ -24,6 +24,7 @@ internal class AccountRegisterHandler : AbstractHandler
             {
                 var account = (await DatabaseManager.Factory.Query("accounts").GetAsync()).ToArray();
 
+#if !DEBUG
                 if (account.FirstOrDefault(x => x.registered_mac == request.MacAddress) != null)
                 {
                     packet.Encode(new ServerAccountRegister
@@ -31,6 +32,7 @@ internal class AccountRegisterHandler : AbstractHandler
                     session.Send(packet);
                     return;
                 }
+#endif
 
                 if (account.FirstOrDefault(x => x.username == request.UserName) != null)
                 {
@@ -47,9 +49,12 @@ internal class AccountRegisterHandler : AbstractHandler
                 {
                     username = request.UserName,
                     password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password),
-                    registered_mac = request.MacAddress
+                    name = request.UserName,
+                    registered_mac = request.MacAddress,
+                    avatar = Constants.DefaultProfileImage,
+                    avatar_update_date = DateTime.Now.Ticks
                 });
-                ChatServer.Instance.AddUser(new User((uint) id, request.UserName, request.UserName, null, null));
+                ChatServer.Instance.AddUser(new User((uint) id, request.UserName, request.UserName, null, (ulong) DateTime.Now.Ticks));
             }
 
             packet.Encode(new ServerAccountRegister {Result = ServerAccountRegister.RegisterResult.Success});

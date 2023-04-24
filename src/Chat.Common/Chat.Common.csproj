@@ -15,6 +15,7 @@
     <None Remove="Proto\ClientMessage.proto" />
     <None Remove="Proto\ClientMessageSync.proto" />
     <None Remove="Proto\ClientRemoveFriend.proto" />
+    <None Remove="Proto\ClientRequestImage.proto" />
     <None Remove="Proto\ClientRequestKey.proto" />
     <None Remove="Proto\ClientResponseKey.proto" />
     <None Remove="Proto\ClientStartChat.proto" />
@@ -32,6 +33,7 @@
     <None Remove="Proto\ServerMessageSync.proto" />
     <None Remove="Proto\ServerRemoveFriend.proto" />
     <None Remove="Proto\ServerRequestKey.proto" />
+    <None Remove="Proto\ServerResponseImage.proto" />
     <None Remove="Proto\ServerSyncMusic.proto" />
     <None Remove="Proto\ServerSyncVideo.proto" />
     <None Remove="Proto\ServerUserList.proto" />
@@ -40,6 +42,8 @@
 
   <ItemGroup>
     <AdditionalFiles Include="Proto\ClientAccountRegister.proto" />
+    <AdditionalFiles Include="Proto\ServerResponseImage.proto" />
+    <AdditionalFiles Include="Proto\ClientRequestImage.proto" />
     <AdditionalFiles Include="Proto\ServerDeliverKey.proto" />
     <AdditionalFiles Include="Proto\ClientResponseKey.proto" />
     <AdditionalFiles Include="Proto\ServerRequestKey.proto" />

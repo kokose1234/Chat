@@ -39,9 +39,13 @@ internal class ChatServer : TcpServer
 
     public Channel? GetChannel(uint channelId) => _channels.FirstOrDefault(x => x.Id == channelId, null);
 
+    public List<Channel> GetAllChannels() => _channels.ToList();
+
     public User? GetUser(uint userId) => _users.FirstOrDefault(x => x.Id == userId, null);
 
     public List<User> GetUsers(uint[] ids) => _users.Where(x => ids.Contains(x.Id)).ToList();
+
+    public List<User> GetAllUsers() => _users.ToList();
 
     public void AddClient(ChatClient client)
     {
@@ -111,7 +115,7 @@ internal class ChatServer : TcpServer
 
         foreach (var account in accounts)
         {
-            var user = new User(account.id, account.username, account.name, account.message, account.avatar);
+            var user = new User(account.id, account.username, account.name, account.message, account.avatar_update_date);
             _users.Add(user);
         }
 

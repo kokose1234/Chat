@@ -13,19 +13,17 @@ public class User : ISavableObject
 
     public string? Message { get; set; }
 
-    public byte[]? Avatar { get; set; }
-
-    public bool HasAvatar => Avatar != null;
+    public ulong LastAvatarUpdate { get; set; }
 
     public ChatClient? Client { get; set; }
 
-    public User(uint id, string username, string nickname, string? message, byte[]? avatar)
+    public User(uint id, string username, string nickname, string? message, ulong lastAvatarUpdate)
     {
         Id = id;
         Username = username;
         Nickname = nickname;
         Message = message;
-        Avatar = avatar;
+        LastAvatarUpdate = lastAvatarUpdate;
     }
 
     protected User(User other)
@@ -34,7 +32,7 @@ public class User : ISavableObject
         Username = other.Username;
         Nickname = other.Nickname;
         Message = other.Message;
-        Avatar = other.Avatar;
+        LastAvatarUpdate = other.LastAvatarUpdate;
     }
 
     public void Send(OutPacket packet, bool dispose = true)
@@ -43,10 +41,7 @@ public class User : ISavableObject
     }
 
 
-    public void Save()
-    {
-  
-    }
+    public void Save() { }
 
     public virtual void OnDisconnected()
     {

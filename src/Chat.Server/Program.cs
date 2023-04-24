@@ -9,7 +9,7 @@ internal static class Program
 {
     private static void Main(string[] args)
     {
-        Console.Title = $"Chat Server - {Constants.Version}";
+        Console.Title = $"Chat Server - {Constants.VERSION}";
 
         var server = new ChatServer(IPAddress.Any, 9000);
         PacketHandlers.RegisterPackets();
@@ -39,13 +39,24 @@ internal static class Program
                         var data = File.ReadAllBytes($"./{i}.png");
                         DatabaseManager.Factory.Query("accounts").Where("id", i).Update(new
                         {
-                            avatar = data
+                            avatar = data,
+                            avatar_update_date = DateTime.Now.Ticks
                         });
                     }
 
                     DatabaseManager.Factory.Query("accounts").Where("id", 7).Update(new
                     {
-                        avatar = File.ReadAllBytes("./7.jpeg")
+                        avatar = File.ReadAllBytes("./7.jpeg"),
+                        avatar_update_date = DateTime.Now.Ticks
+                    });
+                    break;
+                }
+                case "/test2":
+                {
+                    DatabaseManager.Factory.Query("accounts").Where("id", 3).Update(new
+                    {
+                        avatar = File.ReadAllBytes("./tung.png"),
+                        avatar_update_date = DateTime.Now.Ticks
                     });
                     break;
                 }

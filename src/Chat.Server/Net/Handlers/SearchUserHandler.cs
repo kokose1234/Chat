@@ -4,7 +4,6 @@ using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Client;
 using Chat.Common.Packet.Data.Server;
 using Chat.Server.Database;
-using SqlKata.Execution;
 
 namespace Chat.Server.Net.Handlers;
 
@@ -18,13 +17,13 @@ public class SearchUserHandler : AbstractHandler
 
         using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
-            var users = (await DatabaseManager.Factory.Query("accounts").WhereLike("name", $"%{request.SearchTerm}%").OrWhereLike("username", $"%{request.SearchTerm}%").GetAsync()).ToArray();
+            var users = ChatServer.Instance.GetAllUsers().Where(x => x.Username.Contains(request.SearchTerm) || x.Nickname.Contains(request.SearchTerm));
 
             foreach (var user in users)
             {
-                if (user.id == session.Client.Id) continue;
-                var info = new ServerUserSearchResult.User {Username = user.username, Nickname = user.name, Message = user.message, Avatar = user.avatar};
-                response.UserMaps.Add(user.id, info);
+                if (user.Id == session.Client.Id) continue;
+                var info = new ServerUserSearchResult.User {Username = user.Username, Nickname = user.Nickname, Message = user.Message, LastAvatarUpdate = user.LastAvatarUpdate};
+                response.UserMaps.Add(user.Id, info);
             }
         }
 

@@ -18,7 +18,7 @@ public class ChatSession : TcpSession
     private byte[] _sendKey = new byte[8];
     private byte[] _recvKey = new byte[8];
 
-    private uint _lastPacketSize = 0;
+    private uint _lastPacketSize;
     private readonly List<ArraySegment<byte>> _incompletePackets = new();
     private readonly ConcurrentQueue<ArraySegment<byte>> _rawRecvQueue = new();
 
@@ -183,7 +183,7 @@ public class ChatSession : TcpSession
     {
         return new()
         {
-            Version = Constants.Version,
+            Version = Constants.VERSION,
             SendIv = BitConverter.ToUInt64(_sendKey),
             RecieveIv = BitConverter.ToUInt64(_recvKey)
         };

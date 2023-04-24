@@ -1,0 +1,14 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Chat.Common.Packet.Data.Client";
+
+message ClientRequestImage {
+	Type type = 1;
+	repeated uint32 ids = 2;
+
+	enum Type {
+		PROFILE = 0;
+		CHANNEL_PROFILE = 1;
+		MESSAGE = 2;
+	}
+}

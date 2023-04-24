@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Chat.Client.Database.Entities;
 using LiteDB;
 using Nito.AsyncEx;
@@ -22,6 +21,7 @@ public abstract class RepositoryBase<T> : IDisposable, IRepository where T : Ent
 
     public void Dispose()
     {
+        Database.Commit();
         Database.Dispose();
     }
 }
