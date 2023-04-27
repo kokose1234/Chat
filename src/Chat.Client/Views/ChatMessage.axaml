@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Chat.Client.ViewModels"
+             xmlns:types="clr-namespace:Chat.Client.Data.Types"
              mc:Ignorable="d"
              x:Class="Chat.Client.Views.ChatMessage">
     <Design.DataContext>
@@ -11,17 +12,26 @@
     <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
         <Border Grid.Column="1" Background="#182533" BorderBrush="Transparent" BorderThickness="0" CornerRadius="10"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="7">
-                <TextBlock Text="{Binding Username}" Foreground="#F9B3AB" FontFamily="나눔고딕" FontSize="12"
-                           FontWeight="Bold" IsVisible="{Binding !IsImage}" />
-                <TextBlock Text="{Binding Message}" TextWrapping="Wrap" MaxWidth="250"
-                           Foreground="#F0F3F7" IsVisible="{Binding !IsImage}"
-                           FontFamily="나눔고딕" FontSize="17" />
-                <Image HorizontalAlignment="Center" IsVisible="{Binding IsImage}" />
-                <TextBlock Text="{Binding Date}" HorizontalAlignment="Right" FontSize="11"
-                           Foreground="#4C6B7B"
-                           FontFamily="나눔고딕" FontWeight="Bold" />
-            </StackPanel>
+            <Grid>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="7"
+                            IsVisible="{Binding !IsAlert}">
+                    <TextBlock Text="{Binding Username}" Foreground="#F9B3AB" FontFamily="나눔고딕" FontSize="12"
+                               FontWeight="Bold" IsVisible="{Binding !IsImage}" />
+                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" MaxWidth="250"
+                               Foreground="#F0F3F7" IsVisible="{Binding !IsImage}"
+                               FontFamily="나눔고딕" FontSize="15" />
+                    <Image HorizontalAlignment="Center" IsVisible="{Binding IsImage}" />
+                    <TextBlock Text="{Binding Date}" HorizontalAlignment="Right" FontSize="11"
+                               Foreground="#4C6B7B"
+                               FontFamily="나눔고딕" FontWeight="Bold" />
+                </StackPanel>
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="7"
+                            IsVisible="{Binding IsAlert}">
+                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" MaxWidth="250" Foreground="#F0F3F7"
+                               FontFamily="나눔고딕" FontSize="13" FontWeight="Bold" />
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

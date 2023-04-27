@@ -3,6 +3,7 @@ using System.Globalization;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Layout;
+using Chat.Client.Data.Types;
 using Chat.Client.ViewModels;
 
 namespace Chat.Client.Data.Converters;
@@ -13,7 +14,14 @@ public class MessagePositionConverter : IValueConverter
     {
         if (value is MessageViewModel msg)
         {
-            return msg.IsMine ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+            switch (msg.Type)
+            {
+                case MessageType.Alert:
+                    return HorizontalAlignment.Center;
+                case MessageType.Message:
+                case MessageType.Image:
+                    return msg.IsMine ? HorizontalAlignment.Right : HorizontalAlignment.Left;
+            }
         }
 
         return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);

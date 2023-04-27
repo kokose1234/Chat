@@ -296,7 +296,8 @@ namespace Chat.Client.ViewModels
             if (SelectedChannel == null) return;
             if (SelectedChannel.IsSecret && SelectedChannel.Key.Length == 0)
             {
-                //TODO: Message
+                var alert = new MessageViewModel("단대단 암호화 키가 없습니다.");
+                CurrentMessages.Add(alert);
                 ChatMessage = string.Empty;
                 return;
             }
@@ -321,7 +322,8 @@ namespace Chat.Client.ViewModels
             if (SelectedChannel == null) return;
             if (SelectedChannel.IsSecret && SelectedChannel.Key.Length == 0)
             {
-                //TODO: Message
+                var alert = new MessageViewModel("단대단 암호화 키가 없습니다.");
+                CurrentMessages.Add(alert);
                 return;
             }
 
@@ -336,13 +338,12 @@ namespace Chat.Client.ViewModels
 
             if (ofd.ShowDialog() != DialogResult.OK) return;
 
-#if !DEBUG
-            if (ofd.FileName.Length > 50000000)
+            if (new FileInfo(ofd.FileName).Length > 30000000)
             {
-                MessageBox.Show("최대 50MB만 전송할 수 있습니다", "알림");
+                var alert = new MessageViewModel("최대 30MB의 파일만 전송할 수 있습니다.");
+                CurrentMessages.Add(alert);
                 return;
             }
-#endif
 
             var file = File.ReadAllBytes(ofd.FileName);
             var data = new byte[file.Length + 1];
