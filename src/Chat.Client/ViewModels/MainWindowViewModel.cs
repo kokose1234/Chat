@@ -148,6 +148,8 @@ namespace Chat.Client.ViewModels
         public List<UserInfo> Friends { get; } = new();
         public uint UserId { get; set; }
 
+        public Action OnMessageAdded { get; set; }
+
         [Reactive]
         public string SearchTerm { get; set; } = string.Empty;
 
@@ -182,7 +184,8 @@ namespace Chat.Client.ViewModels
                     if (channel != null)
                     {
                         CurrentMessages.Clear();
-                        CurrentMessages.AddRange(Messages.Where(m => m.ChannelId == channel.Id).Select(x => new MessageViewModel(x.SenderName, x.Message, x.Time.ToString("yyyy-MM-dd tt h:mm"), x.SenderId == UserId)));
+                        CurrentMessages.AddRange(Messages.Where(m => m.ChannelId == channel.Id).Select(x => new MessageViewModel(x.SenderName, x.Message, x.Time.ToString("yyyy-MM-dd tt h:mm"), x.SenderId == UserId, x.Attachment != null ? x.Id : null)));
+                        OnMessageAdded?.Invoke();
                     }
                 });
 
@@ -235,18 +238,41 @@ namespace Chat.Client.ViewModels
                 ChannelId = message.ChannelId,
                 SenderId = message.Sender,
                 Message = text,
-                Time = message.Date ?? DateTime.Now
+                Time = message.Date ?? DateTime.Now,
+                SenderName = Users.First(x => x.Id == message.Sender).Name
             };
-            Channels.First(x => x.Id == message.ChannelId).Description = text;
-            msg.SenderName = Users.First(x => x.Id == message.Sender).Name;
 
+            Channels.First(x => x.Id == message.ChannelId).Description = text;
             Messages.Add(msg);
 
             if (SelectedChannel != null && SelectedChannel.Id == message.ChannelId)
             {
                 CurrentMessages.Add(new MessageViewModel(msg.SenderName, msg.Message, msg.Time.ToString("yyyy-MM-dd tt h:mm"), msg.SenderId == UserId));
+                OnMessageAdded?.Invoke();
             }
         }
+
+        public void AddImageMessage(Message message)
+        {
+            var msg = new ChatMessage
+            {
+                Id = message.Id,
+                ChannelId = message.ChannelId,
+                SenderId = message.Sender,
+                Attachment = message.Attachment,
+                Time = message.Date ?? DateTime.Now,
+                SenderName = Users.First(x => x.Id == message.Sender).Name
+            };
+
+            Messages.Add(msg);
+
+            if (SelectedChannel != null && SelectedChannel.Id == message.ChannelId)
+            {
+                CurrentMessages.Add(new MessageViewModel(msg.SenderName, msg.Message, msg.Time.ToString("yyyy-MM-dd tt h:mm"), msg.SenderId == UserId, msg.Id));
+                OnMessageAdded?.Invoke();
+            }
+        }
+
 
         public void PlayMusic(byte[] data)
         {
@@ -298,6 +324,7 @@ namespace Chat.Client.ViewModels
             {
                 var alert = new MessageViewModel("단대단 암호화 키가 없습니다.");
                 CurrentMessages.Add(alert);
+                OnMessageAdded?.Invoke();
                 ChatMessage = string.Empty;
                 return;
             }
@@ -324,6 +351,7 @@ namespace Chat.Client.ViewModels
             {
                 var alert = new MessageViewModel("단대단 암호화 키가 없습니다.");
                 CurrentMessages.Add(alert);
+                OnMessageAdded?.Invoke();
                 return;
             }
 
@@ -342,6 +370,7 @@ namespace Chat.Client.ViewModels
             {
                 var alert = new MessageViewModel("최대 30MB의 파일만 전송할 수 있습니다.");
                 CurrentMessages.Add(alert);
+                OnMessageAdded?.Invoke();
                 return;
             }
 

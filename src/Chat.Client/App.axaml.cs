@@ -6,6 +6,7 @@ using System.Threading;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Chat.Client.Net;
 using Chat.Client.Tools;
 using Chat.Client.ViewModels;
@@ -37,8 +38,13 @@ namespace Chat.Client
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow();
-                desktop.MainWindow.DataContext = new MainWindowViewModel(desktop.MainWindow);
+                var window = new MainWindow();
+                var vm = new MainWindowViewModel(window)
+                {
+                    OnMessageAdded = () => { Dispatcher.UIThread.InvokeAsync(window.ScrollToBottom); }
+                };
+                desktop.MainWindow = window;
+                desktop.MainWindow.DataContext = vm;
             }
 
             base.OnFrameworkInitializationCompleted();

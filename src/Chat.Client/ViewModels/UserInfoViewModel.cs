@@ -54,7 +54,6 @@ public sealed class UserInfoViewModel : DialogViewModelBase, IDisposable
         StartChatCommand = ReactiveCommand.Create(StartChat);
 
         var repo = DatabaseManager.GetRepository<ImageRepository>();
-        using var mutex = repo.Mutex.ReaderLock();
         using var tempStream = new MemoryStream();
         repo.GetProfileImage(userInfo.Id, tempStream);
 

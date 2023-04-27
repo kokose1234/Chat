@@ -7,7 +7,7 @@ namespace Chat.Client.Database.Repositories;
 
 public class ImageRepository : IRepository, IDisposable
 {
-    public AsyncReaderWriterLock Mutex { get; } = new();
+    // public AsyncReaderWriterLock Mutex { get; } = new();
 
     private readonly LiteDatabase _database;
     private readonly ILiteStorage<string> _storage;

@@ -22,20 +22,17 @@ public class SearchUserHandler : AbstractHandler
         var userList = new List<uint>(); // 프로필 이미지를 새로 받아와야 하는 유저 리스트
         var repo = Database.DatabaseManager.GetRepository<UserRepository>();
 
-        using (var mutex = repo.Mutex.ReaderLock())
+        foreach (var (id, user) in response.UserMaps)
         {
-            foreach (var (id, user) in response.UserMaps)
+            var userEntity = repo.GetUser(id);
+
+            if (userEntity == null)
             {
-                var userEntity = repo.GetUser(id);
-
-                if (userEntity == null)
-                {
-                    userList.Add(id);
-                    continue;
-                }
-
-                if (userEntity.LastAvatarUpdate < user.LastAvatarUpdate) userList.Add(id);
+                userList.Add(id);
+                continue;
             }
+
+            if (userEntity.LastAvatarUpdate < user.LastAvatarUpdate) userList.Add(id);
         }
 
         if (userList.Count > 0)

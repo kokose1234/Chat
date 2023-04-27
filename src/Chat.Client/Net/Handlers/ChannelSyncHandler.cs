@@ -18,7 +18,6 @@ public class ChannelSyncHandler : AbstractHandler
     {
         var data = inPacket.Decode<ServerChannelSync>();
         var repo = DatabaseManager.GetRepository<ChannelRepository>();
-        using var mutex = await repo.Mutex.WriterLockAsync();
 
         session.ViewModel.Channels.Clear();
 

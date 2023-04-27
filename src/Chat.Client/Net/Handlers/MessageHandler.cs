@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Chat.Client.Data.Types;
+using Chat.Client.Database;
+using Chat.Client.Database.Repositories;
 using Chat.Client.Tools;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
@@ -59,13 +62,19 @@ public class MessageHandler : AbstractHandler
             var decompressedData = Util.Decompress(message.Message.Attachment);
             var fileData = new byte[decompressedData.Length - 1];
             var fileName = Encoding.UTF8.GetString(message.Message.Text);
-            System.Buffer.BlockCopy(decompressedData, 1, fileData, 0, fileData.Length);
+            Buffer.BlockCopy(decompressedData, 1, fileData, 0, fileData.Length);
 
             switch ((AttachmentType) decompressedData[0])
             {
                 case AttachmentType.Image:
-                    //TODO: AddPicture
+                {
+                    var repo = DatabaseManager.GetRepository<ImageRepository>();
+                    using var stream = new MemoryStream(fileData);
+
+                    repo.UploadImage(message.Message.Id, stream);
+                    session.ViewModel.AddImageMessage(message.Message);
                     break;
+                }
                 case AttachmentType.Music:
                     message.Message.Text = Encoding.UTF8.GetBytes($"{fileName} 재생"); //TODO: 엄준식임
                     session.ViewModel.AddMessage(message.Message);

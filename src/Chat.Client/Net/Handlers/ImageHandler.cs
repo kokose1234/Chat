@@ -19,14 +19,12 @@ public class ImageHandler : AbstractHandler
     {
         var response = inPacket.Decode<ServerResponseImage>();
         var imageRepo = DatabaseManager.GetRepository<ImageRepository>();
-        using var imageMutex = imageRepo.Mutex.WriterLock();
 
         switch (response.type)
         {
             case ServerResponseImage.Type.Profile:
             {
                 var userRepo = DatabaseManager.GetRepository<UserRepository>();
-                using var userMutex = userRepo.Mutex.WriterLock();
 
                 foreach (var data in response.Datas)
                 {

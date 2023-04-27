@@ -187,7 +187,7 @@
                 </Grid>
                 <ScrollViewer Grid.Row="1" x:Name="ChatScrollViewer" IsVisible="{Binding SelectedChannel, Converter={x:Static ObjectConverters.IsNotNull}}">
                     <StackPanel Background="#0E1621">
-                        <ItemsControl Items="{Binding CurrentMessages}" PropertyChanged="ChatScrollViewer_OnPropertyChanged">
+                        <ItemsControl Items="{Binding CurrentMessages}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <v:ChatMessage x:Name="ChatMessage" Margin="10,5"

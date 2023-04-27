@@ -19,7 +19,6 @@ public class UserListHandler : AbstractHandler
 
         using var packet = new OutPacket(ClientHeader.ClientMessageSync);
         var repo = DatabaseManager.GetRepository<ConfigRepository>();
-        using var mutex = await repo.Mutex.ReaderLockAsync();
         var request = new ClientMessageSync
         {
             LastMessageId = repo.GetConfig().LastMessage

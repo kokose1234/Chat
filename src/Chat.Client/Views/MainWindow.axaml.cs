@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using System.Windows.Forms;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Mixins;
@@ -8,6 +7,7 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.ReactiveUI;
+using Avalonia.Threading;
 using Chat.Client.Net;
 using Chat.Client.ViewModels;
 using ReactiveUI;
@@ -32,7 +32,6 @@ namespace Chat.Client.Views
                 this.Bind(ViewModel, vm => vm.SelectedUser, v => v.SearchUserList.SelectedItem)
                     .DisposeWith(disposables);
             });
-
             InitializeComponent();
         }
 
@@ -135,9 +134,6 @@ namespace Chat.Client.Views
             ViewModel?.OpenUserInfoCommand.Execute().Subscribe();
         }
 
-        private void ChatScrollViewer_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-        {
-            ChatScrollViewer?.ScrollToEnd();
-        }
+        public void ScrollToBottom() => ChatScrollViewer?.ScrollToEnd();
     }
 }

@@ -7,7 +7,7 @@ namespace Chat.Client.Database.Repositories;
 
 public abstract class RepositoryBase<T> : IDisposable, IRepository where T : EntityBase
 {
-    public AsyncReaderWriterLock Mutex { get; } = new();
+    // public AsyncReaderWriterLock Mutex { get; } = new();
 
     protected LiteDatabase Database { get; }
 
