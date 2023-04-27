@@ -359,6 +359,7 @@ namespace Chat.Client.ViewModels
             };
 
             Buffer.BlockCopy(file, 0, data, 1, file.Length);
+            data = Util.Compress(data);
 
             if (SelectedChannel.IsSecret)
             {

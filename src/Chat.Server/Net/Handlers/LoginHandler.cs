@@ -19,7 +19,6 @@ public class LoginHandler : AbstractHandler
         uint userId;
         dynamic self;
 
-        using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
             using var packet = new OutPacket(ServerHeader.ServerLogin);
             var account = (await DatabaseManager.Factory.Query("accounts").Where("username", request.UserName).GetAsync())
@@ -62,27 +61,12 @@ public class LoginHandler : AbstractHandler
             ChatServer.Instance.AddClient(client);
         }
 
-        using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
         {
             using var packet = new OutPacket(ServerHeader.ServerUserList);
-            var channels = ChatServer.Instance.GetChannels(userId);
-            var channelUsers = channels.SelectMany(x => x.Users)
-                                       .DistinctBy(x => x.Id)
-                                       .Select(x => new
-                                       {
-                                           id = x.Id,
-                                           name = x.Nickname
-                                       });
-            var friends = (await DatabaseManager.Factory.Query("accounts")
-                                                .Join("friends", "accounts.id", "friends.friend_user_id")
-                                                .Where("friends.user_id", userId)
-                                                .Distinct()
-                                                .GetAsync()).ToImmutableArray();
-            var users = channelUsers.Concat(friends).ToList();
-            users.Add(self);
+            var users = await DatabaseManager.Factory.SelectAsync("CALL getRelatedUsers(@userId)", new {userId = userId});
             var userList = new ServerUserList();
 
-            userList.Users.AddRange(users.DistinctBy(x => x.id).Select(user => new UserInfo
+            userList.Users.AddRange(users.Select(user => new UserInfo
             {
                 Id = user.id,
                 Name = user.name

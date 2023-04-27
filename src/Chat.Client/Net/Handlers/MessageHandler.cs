@@ -56,11 +56,12 @@ public class MessageHandler : AbstractHandler
                 return Task.CompletedTask;
             }
 
-            var fileData = new byte[message.Message.Attachment.Length - 1];
+            var decompressedData = Util.Decompress(message.Message.Attachment);
+            var fileData = new byte[decompressedData.Length - 1];
             var fileName = Encoding.UTF8.GetString(message.Message.Text);
-            System.Buffer.BlockCopy(message.Message.Attachment, 1, fileData, 0, fileData.Length);
+            System.Buffer.BlockCopy(decompressedData, 1, fileData, 0, fileData.Length);
 
-            switch ((AttachmentType) message.Message.Attachment[0])
+            switch ((AttachmentType) decompressedData[0])
             {
                 case AttachmentType.Image:
                     //TODO: AddPicture

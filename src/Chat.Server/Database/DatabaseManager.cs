@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using Nito.AsyncEx;
 using SqlKata.Compilers;
 using SqlKata.Execution;
 
@@ -26,8 +25,6 @@ internal static class DatabaseManager
         }
     }
 
-    public static AsyncReaderWriterLock Mutex { get; } = new();
-    
     internal static void Setup()
     {
         var connection =

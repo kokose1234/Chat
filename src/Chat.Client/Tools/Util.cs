@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Net.NetworkInformation;
 
 namespace Chat.Client.Tools;
@@ -33,5 +35,34 @@ internal static class Util
         }
 
         return encryptedData;
+    }
+
+    public static byte[] Compress(byte[] buffer)
+    {
+        using var ms = new MemoryStream();
+        using (var ds = new DeflateStream(ms, CompressionLevel.SmallestSize))
+        {
+            ds.Write(buffer, 0, buffer.Length);
+        }
+
+        var compressedByte = ms.ToArray();
+
+        return compressedByte;
+    }
+
+    public static byte[] Decompress(byte[] buffer)
+    {
+        using var resultStream = new MemoryStream();
+        using (var ms = new MemoryStream(buffer))
+        {
+            using (var ds = new DeflateStream(ms, CompressionMode.Decompress))
+            {
+                ds.CopyTo(resultStream);
+                ds.Close();
+            }
+        }
+
+        var decompressedByte = resultStream.ToArray();
+        return decompressedByte;
     }
 }

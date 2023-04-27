@@ -86,7 +86,6 @@ internal class ChatServer : TcpServer
 
     public async Task<Channel> AddChannel(uint id)
     {
-        using var mutex = await DatabaseManager.Mutex.ReaderLockAsync();
         var channels = await DatabaseManager.Factory.Query("channels").Where("id", id).FirstAsync();
         var channel = new Channel(channels.id, channels.name, channels.is_secret == 1);
         _channels.Add(channel);
@@ -108,7 +107,6 @@ internal class ChatServer : TcpServer
 
     private async void LoadFromDatabase()
     {
-        using var mutex = await DatabaseManager.Mutex.ReaderLockAsync();
         using var packet = new OutPacket(ServerHeader.ServerLogin);
         var accounts = await DatabaseManager.Factory.Query("accounts").GetAsync();
         var channels = await DatabaseManager.Factory.Query("channels").GetAsync();

@@ -27,25 +27,20 @@ public class StartChatHandler : AbstractHandler
         var data = new ServerCreateChannel();
         var channelName = string.IsNullOrEmpty(request.Name) ? string.Join(", ", users.Select(x => x.Nickname)) : request.Name;
         var key = request.IsSecret ? Util.GetRandomBytes(32) : null;
-        uint id;
-
-        using (var mutex = await DatabaseManager.Mutex.WriterLockAsync())
+        var id = await DatabaseManager.Factory.Query("channels").InsertGetIdAsync<uint>(new
         {
-            id = await DatabaseManager.Factory.Query("channels").InsertGetIdAsync<uint>(new
-            {
-                name = channelName,
-                is_secret = request.IsSecret ? 1 : 0,
-            });
+            name = channelName,
+            is_secret = request.IsSecret ? 1 : 0,
+        });
 
-            foreach (var user in users)
+        foreach (var user in users)
+        {
+            await DatabaseManager.Factory.Query("channel_users").InsertAsync(new
             {
-                await DatabaseManager.Factory.Query("channel_users").InsertAsync(new
-                {
-                    channel_id = id,
-                    user_id = user.Id,
-                    is_admin = user.Id == session.Client.Id ? 1 : 0
-                });
-            }
+                channel_id = id,
+                user_id = user.Id,
+                is_admin = user.Id == session.Client.Id ? 1 : 0
+            });
         }
 
         var channel = await ChatServer.Instance.AddChannel(id);

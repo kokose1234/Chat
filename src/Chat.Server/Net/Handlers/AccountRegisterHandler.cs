@@ -20,9 +20,7 @@ internal class AccountRegisterHandler : AbstractHandler
         {
             var request = inPacket.Decode<ClientAccountRegister>();
 
-            using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
-            {
-                var account = (await DatabaseManager.Factory.Query("accounts").GetAsync()).ToArray();
+            var account = (await DatabaseManager.Factory.Query("accounts").GetAsync()).ToArray();
 
 #if !DEBUG
                 if (account.FirstOrDefault(x => x.registered_mac == request.MacAddress) != null)
@@ -34,28 +32,24 @@ internal class AccountRegisterHandler : AbstractHandler
                 }
 #endif
 
-                if (account.FirstOrDefault(x => x.username == request.UserName) != null)
-                {
-                    packet.Encode(new ServerAccountRegister
-                        {Result = ServerAccountRegister.RegisterResult.FailDuplicateUsesrname});
-                    session.Send(packet);
-                    return;
-                }
+            if (account.FirstOrDefault(x => x.username == request.UserName) != null)
+            {
+                packet.Encode(new ServerAccountRegister
+                    {Result = ServerAccountRegister.RegisterResult.FailDuplicateUsesrname});
+                session.Send(packet);
+                return;
             }
 
-            using (var mutex = await DatabaseManager.Mutex.WriterLockAsync())
+            var id = await DatabaseManager.Factory.Query("accounts").InsertAsync(new
             {
-                var id = await DatabaseManager.Factory.Query("accounts").InsertAsync(new
-                {
-                    username = request.UserName,
-                    password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password),
-                    name = request.UserName,
-                    registered_mac = request.MacAddress,
-                    avatar = Constants.DefaultProfileImage,
-                    avatar_update_date = DateTime.Now.Ticks
-                });
-                ChatServer.Instance.AddUser(new User((uint) id, request.UserName, request.UserName, null, (ulong) DateTime.Now.Ticks));
-            }
+                username = request.UserName,
+                password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password),
+                name = request.UserName,
+                registered_mac = request.MacAddress,
+                avatar = Constants.DefaultProfileImage,
+                avatar_update_date = DateTime.Now.Ticks
+            });
+            ChatServer.Instance.AddUser(new User((uint) id, request.UserName, request.UserName, null, (ulong) DateTime.Now.Ticks));
 
             packet.Encode(new ServerAccountRegister {Result = ServerAccountRegister.RegisterResult.Success});
             session.Send(packet);

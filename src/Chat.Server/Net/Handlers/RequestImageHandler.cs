@@ -16,32 +16,29 @@ public class RequestImageHandler : AbstractHandler
         var request = inPacket.Decode<ClientRequestImage>();
         var response = new ServerResponseImage();
 
-        using (var mutex = await DatabaseManager.Mutex.ReaderLockAsync())
+        switch (request.type)
         {
-            switch (request.type)
-            {
-                case ClientRequestImage.Type.Profile:
-                    var users = await DatabaseManager.Factory.Query("accounts").WhereIn("id", request.Ids).GetAsync();
+            case ClientRequestImage.Type.Profile:
+                var users = await DatabaseManager.Factory.Query("accounts").WhereIn("id", request.Ids).GetAsync();
 
-                    foreach (var user in users)
+                foreach (var user in users)
+                {
+                    response.Datas.Add(new ServerResponseImage.Data
                     {
-                        response.Datas.Add(new ServerResponseImage.Data
-                        {
-                            Id = user.id,
-                            Image = user.avatar,
-                            Update = user.avatar_update_date
-                        });
-                    }
+                        Id = user.id,
+                        Image = user.avatar,
+                        Update = user.avatar_update_date
+                    });
+                }
 
-                    response.type = ServerResponseImage.Type.Profile;
-                    break;
-                case ClientRequestImage.Type.ChannelProfile:
-                    response.type = ServerResponseImage.Type.ChannelProfile;
-                    break;
-                case ClientRequestImage.Type.Message:
-                    response.type = ServerResponseImage.Type.Message;
-                    break;
-            }
+                response.type = ServerResponseImage.Type.Profile;
+                break;
+            case ClientRequestImage.Type.ChannelProfile:
+                response.type = ServerResponseImage.Type.ChannelProfile;
+                break;
+            case ClientRequestImage.Type.Message:
+                response.type = ServerResponseImage.Type.Message;
+                break;
         }
 
         using var packet = new OutPacket(ServerHeader.ServerResponseImage);
