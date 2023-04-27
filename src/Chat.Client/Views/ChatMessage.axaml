@@ -20,8 +20,8 @@
                     <TextBlock Text="{Binding Message}" TextWrapping="Wrap" MaxWidth="250"
                                Foreground="#F0F3F7" IsVisible="{Binding !IsImage}"
                                FontFamily="나눔고딕" FontSize="15" />
-                    <Image HorizontalAlignment="Center" Source="{Binding Image}" IsVisible="{Binding IsImage}"
-                           MaxWidth="300" MaxHeight=" 300" Stretch="UniformToFill" />
+                    <Image Name="Image" HorizontalAlignment="Center" Source="{Binding Image}" IsVisible="{Binding IsImage}"
+                           MaxWidth="250" MaxHeight="250" Stretch="Fill" PointerPressed="Image_OnPointerPressed" />
                     <TextBlock Text="{Binding Date}" HorizontalAlignment="Right" FontSize="11"
                                Foreground="#4C6B7B"
                                FontFamily="나눔고딕" FontWeight="Bold" />

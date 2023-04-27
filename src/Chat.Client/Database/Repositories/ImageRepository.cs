@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using LiteDB;
 using Nito.AsyncEx;
 
@@ -24,15 +25,24 @@ public class ImageRepository : IRepository, IDisposable
 
     public void UploadImage(uint messageId, Stream stream) => UploadImage($"$/message/{messageId}", "message-image", stream);
 
+    public void UploadThumbnailImage(uint messageId, Stream stream) => UploadImage($"$/thumbnail/{messageId}", "thumbnail", stream);
+
     public void GetProfileImage(uint userId, Stream stream) => GetImage($"$/profile/{userId}", stream);
 
     public void GetChannelImage(uint channelId, Stream stream) => GetImage($"$/channel/{channelId}", stream);
 
     public void GetImage(uint messageId, Stream stream) => GetImage($"$/message/{messageId}", stream);
 
+    public void GetThumbnailImage(uint messageId, Stream stream) => GetImage($"$/thumbnail/{messageId}", stream);
+
     public void UploadImage(string id, string name, Stream stream) => _storage.Upload(id, name, stream);
 
     public void GetImage(string id, Stream stream) => _storage.Download(id, stream);
+
+    public void Test(uint id)
+    {
+        var allFiles = _storage.FindAll().ToArray();
+    }
 
     public void Dispose()
     {

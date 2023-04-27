@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Chat.Client.ViewModels"
+        mc:Ignorable="d"
+        MinWidth="100" MinHeight="100" Width="1280" Height="720"
+        x:Class="Chat.Client.Views.ImageWindow" x:DataType="vm:ImageViewModel"
+        ExtendClientAreaToDecorationsHint="True" ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1" Background="#17212B"
+        ShowInTaskbar="True" Title="Chat">
+
+    <Design.DataContext>
+        <vm:ImageViewModel />
+    </Design.DataContext>
+
+    <Window.Styles>
+        <Style Selector="Image.TopBarButton">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Stretch" Value="Fill" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+        </Style>
+        <Style Selector="Grid.CloseButton:pointerover">
+            <Setter Property="Background" Value="#E92539" />
+        </Style>
+    </Window.Styles>
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RowDefinitions="25, *">
+        <Grid Name="TopBar" Background="#242F3D" Height="25" PointerPressed="TopBar_OnPointerPressed">
+            <Grid HorizontalAlignment="Right">
+                <Grid Name="CloseButton" Classes="TopBarButton CloseButton" Width="25" Height="25"
+                      PointerPressed="CloseButton_OnPointerPressed" PointerEnter="CloseButton_OnPointerEnter"
+                      PointerLeave="CloseButton_OnPointerLeave">
+                    <Image Name="CloseImage" Classes="TopBarButton" Source="/Assets/Buttons/close-button.png" />
+                </Grid>
+            </Grid>
+        </Grid>
+        <Image Name="ImageView" Grid.Row="1" Source="{Binding Image}" Stretch="Uniform" />
+    </Grid>
+</Window>

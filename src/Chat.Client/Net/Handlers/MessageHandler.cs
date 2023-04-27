@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Chat.Client.Data.Types;
 using Chat.Client.Database;
 using Chat.Client.Database.Repositories;
@@ -13,6 +14,11 @@ using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
 using Chat.Common.Tools;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace Chat.Client.Net.Handlers;
 
@@ -20,6 +26,8 @@ namespace Chat.Client.Net.Handlers;
 public class MessageHandler : AbstractHandler
 {
     private readonly Queue<ServerMessage> _queue = new();
+    private readonly ResizeOptions _resizeOptions = new() {Mode = ResizeMode.Max, Position = AnchorPositionMode.Center, Size = new Size(250, 250)};
+    private readonly IImageEncoder _encoder = new PngEncoder();
 
     internal override Task Handle(ChatClient session, InPacket inPacket)
     {
@@ -69,9 +77,19 @@ public class MessageHandler : AbstractHandler
                 case AttachmentType.Image:
                 {
                     var repo = DatabaseManager.GetRepository<ImageRepository>();
+                    using var image = Image.Load(fileData);
                     using var stream = new MemoryStream(fileData);
 
+                    image.Mutate(x => x.Resize(_resizeOptions));
+                    image.Save("./temp.png", _encoder);
+                    var thumbnailStream = File.Open("./temp.png", FileMode.Open);
+
                     repo.UploadImage(message.Message.Id, stream);
+                    repo.UploadThumbnailImage(message.Message.Id, thumbnailStream);
+
+                    thumbnailStream.Dispose();
+                    File.Delete("./temp.png");
+
                     session.ViewModel.AddImageMessage(message.Message);
                     break;
                 }

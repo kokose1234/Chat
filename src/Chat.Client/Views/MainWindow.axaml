@@ -14,7 +14,7 @@
         x:Class="Chat.Client.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="" CanResize="False" ExtendClientAreaToDecorationsHint="True"
+        Title="Chat" CanResize="False" ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome" ExtendClientAreaTitleBarHeightHint="-1"
         Background="#17212B">
 
