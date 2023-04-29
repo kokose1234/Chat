@@ -1,10 +1,19 @@
-﻿using Chat.Client.Database.Entities;
+﻿using System.Collections.Generic;
+using Chat.Client.Database.Entities;
 
 namespace Chat.Client.Database.Repositories;
 
 public class ChannelRepository : RepositoryBase<ChannelEntity>
 {
     public ChannelRepository(string id) : base(id, "channel") { }
+
+    public IEnumerable<ChannelEntity>? GetAllChannels()
+    {
+        var result = Collection.Query()
+                               .OrderBy(x => x.ChannelId)
+                               .ToEnumerable();
+        return result;
+    }
 
     public ChannelEntity? GetChannel(uint id)
     {

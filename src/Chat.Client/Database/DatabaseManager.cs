@@ -18,8 +18,9 @@ public static class DatabaseManager
         Repositories.Add(typeof(ConfigRepository), new ConfigRepository(id));
         Repositories.Add(typeof(ChannelRepository), new ChannelRepository(id));
         Repositories.Add(typeof(UserRepository), new UserRepository(id));
+        Repositories.Add(typeof(MessageRepository), new MessageRepository(id));
 
-        Repositories.Add(typeof(ImageRepository), new ImageRepository());
+        Repositories.Add(typeof(ImageRepository), new ImageRepository(id));
 
         IsInitialized = true;
     }

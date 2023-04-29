@@ -37,7 +37,8 @@ public class CreateChannelHandler : AbstractHandler
         {
             Id = ObjectId.NewObjectId(),
             ChannelId = request.Channel.Id,
-            Key = request.Channel.Key
+            Key = request.Channel.Key,
+            IsSecret = request.Channel.IsSecret
         });
 
         return Task.CompletedTask;

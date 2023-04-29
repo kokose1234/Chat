@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -7,6 +8,8 @@ namespace Chat.Client.Tools;
 
 internal static class Util
 {
+    private static readonly Random Random = new();
+
     internal static string GetMacAddress()
     {
         return
@@ -64,5 +67,11 @@ internal static class Util
 
         var decompressedByte = resultStream.ToArray();
         return decompressedByte;
+    }
+
+    public static string GetRandomFileName(int length = 5)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
     }
 }

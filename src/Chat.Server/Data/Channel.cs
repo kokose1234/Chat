@@ -27,11 +27,12 @@ public sealed class Channel : ISavableObject
 
     public ChannelUser? GetUser(uint id) => Users.FirstOrDefault(x => x.Id == id, null);
 
-    public void OnMessage(ChatClient sender, ClientMessage message)
+    public void OnMessage(uint id, ChatClient sender, ClientMessage message)
     {
         var packet = new OutPacket(ServerHeader.ServerMessage);
         var data = new Message
         {
+            Id = id,
             ChannelId = Id,
             Sender = sender.Id,
             Text = message.Message,

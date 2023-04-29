@@ -12,8 +12,7 @@ public class ConfigRepository : RepositoryBase<ConfigEntity>
         {
             config = new()
             {
-                Id = ObjectId.NewObjectId(),
-                LastMessage = 0
+                Id = ObjectId.NewObjectId()
             };
             Collection.Insert(config);
         }

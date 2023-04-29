@@ -5,5 +5,10 @@ import "Data/Message.proto";
 option csharp_namespace = "Chat.Common.Packet.Data.Server";
 
 message ServerMessageSync {
-	repeated Message messages = 1;
+	map<uint32, Messages> messages = 1;
+
+	message Messages {
+		uint32 channel = 1;
+		repeated Message messages = 2;
+	}
 }

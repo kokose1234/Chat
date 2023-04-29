@@ -5,6 +5,7 @@ using Chat.Client.Database.Repositories;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
+using Chat.Common.Packet.Data.Client;
 using Chat.Common.Packet.Data.Server;
 
 namespace Chat.Client.Net.Handlers;
@@ -23,7 +24,13 @@ public class KeyDeliverHandler : AbstractHandler
         session.ViewModel.Channels.First(x => x.Id == response.Channel).Key = response.Key;
         repo.UpdateChannel(channelData);
 
-        //TODO: 이미 온 메시지 복호화
+        using var packet = new OutPacket(ClientHeader.ClientMessageSync);
+        var data = new ClientMessageSync();
+
+        data.LastMessageIds.Add(channelData.ChannelId, 0);
+        packet.Encode(data);
+
+        session.Send(packet);
 
         return Task.CompletedTask;
     }

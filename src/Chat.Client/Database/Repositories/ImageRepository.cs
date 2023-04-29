@@ -8,14 +8,12 @@ namespace Chat.Client.Database.Repositories;
 
 public class ImageRepository : IRepository, IDisposable
 {
-    // public AsyncReaderWriterLock Mutex { get; } = new();
-
     private readonly LiteDatabase _database;
     private readonly ILiteStorage<string> _storage;
 
-    public ImageRepository()
+    public ImageRepository(string id)
     {
-        _database = new("Filename=./Database/file.db;Password=baba1234;Upgrade=true");
+        _database = new($"Filename=./Database/{id}/file.db;Password=baba1234;Upgrade=true");
         _storage = _database.GetStorage<string>();
     }
 
@@ -38,11 +36,6 @@ public class ImageRepository : IRepository, IDisposable
     public void UploadImage(string id, string name, Stream stream) => _storage.Upload(id, name, stream);
 
     public void GetImage(string id, Stream stream) => _storage.Download(id, stream);
-
-    public void Test(uint id)
-    {
-        var allFiles = _storage.FindAll().ToArray();
-    }
 
     public void Dispose()
     {

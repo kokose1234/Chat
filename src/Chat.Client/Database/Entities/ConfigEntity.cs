@@ -2,5 +2,5 @@
 
 public sealed class ConfigEntity : EntityBase
 {
-    public uint LastMessage { get; set; }
+  
 }

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Chat.Client.Data.Types;
 using Chat.Client.Database;
 using Chat.Client.Database.Repositories;
@@ -13,7 +12,6 @@ using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
-using Chat.Common.Tools;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
@@ -79,16 +77,17 @@ public class MessageHandler : AbstractHandler
                     var repo = DatabaseManager.GetRepository<ImageRepository>();
                     using var image = Image.Load(fileData);
                     using var stream = new MemoryStream(fileData);
+                    var randomName = Util.GetRandomFileName();
 
                     image.Mutate(x => x.Resize(_resizeOptions));
-                    image.Save("./temp.png", _encoder);
-                    var thumbnailStream = File.Open("./temp.png", FileMode.Open);
+                    image.Save($"./{randomName}.png", _encoder);
+                    var thumbnailStream = File.Open($"./{randomName}.png", FileMode.Open);
 
                     repo.UploadImage(message.Message.Id, stream);
                     repo.UploadThumbnailImage(message.Message.Id, thumbnailStream);
 
                     thumbnailStream.Dispose();
-                    File.Delete("./temp.png");
+                    File.Delete($"./{randomName}.png");
 
                     session.ViewModel.AddImageMessage(message.Message);
                     break;
