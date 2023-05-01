@@ -7,7 +7,6 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.ReactiveUI;
-using Avalonia.Threading;
 using Chat.Client.Net;
 using Chat.Client.ViewModels;
 using ReactiveUI;
@@ -87,14 +86,19 @@ namespace Chat.Client.Views
 
         private void MenuButton_OnPointerEnter(object? sender, PointerEventArgs e)
         {
-            var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/menu-hover.png"));
+            var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/edit-hover.png"));
             MenuImage.Source = new Bitmap(asset);
         }
 
         private void MenuButton_OnPointerLeave(object? sender, PointerEventArgs e)
         {
-            var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/menu.png"));
+            var asset = _assets.Open(new Uri($"avares://{_assemblyName}/Assets/Buttons/edit.png"));
             MenuImage.Source = new Bitmap(asset);
+        }
+
+        private void MenuButton_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            ViewModel?.EditProfileCommand.Execute().Subscribe();
         }
 
         private void AttachButton_OnPointerEnter(object? sender, PointerEventArgs e)

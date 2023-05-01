@@ -69,7 +69,8 @@ public class LoginHandler : AbstractHandler
             userList.Users.AddRange(users.Select(user => new UserInfo
             {
                 Id = user.id,
-                Name = user.name
+                Name = user.name,
+                Message = user.message
             }));
 
             packet.Encode(userList);
@@ -106,6 +107,21 @@ public class LoginHandler : AbstractHandler
                     session.Send(packet);
                 }
             }
+        }
+
+        {
+            using var packet = new OutPacket(ServerHeader.ServerResponseImage);
+            var packetData = new ServerResponseImage {type = ServerResponseImage.Type.Profile};
+            var data = new ServerResponseImage.Data
+            {
+                Id = self.id,
+                Image = self.avatar,
+                Update = self.avatar_update_date
+            };
+
+            packetData.Datas.Add(data);
+            packet.Encode(packetData);
+            session.Send(packet);
         }
     }
 }

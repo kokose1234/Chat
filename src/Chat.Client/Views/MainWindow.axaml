@@ -112,8 +112,8 @@
             <Grid RowDefinitions="35, *" Background="#17212B">
                 <Grid ColumnDefinitions="30, *" Margin="5">
                     <Grid Name="MenuButton" HorizontalAlignment="Center" VerticalAlignment="Center"
-                          PointerEnter="MenuButton_OnPointerEnter" PointerLeave="MenuButton_OnPointerLeave">
-                        <Image Name="MenuImage" Source="/Assets/Buttons/menu.png" />
+                          PointerEnter="MenuButton_OnPointerEnter" PointerLeave="MenuButton_OnPointerLeave" PointerPressed="MenuButton_OnPointerPressed">
+                        <Image Name="MenuImage" Source="/Assets/Buttons/edit.png" />
                     </Grid>
                     <TextBox Name="SearchTextBox" Grid.Column="1" Background="#242F3D" BorderThickness="0"
                              HorizontalAlignment="Center"

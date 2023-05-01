@@ -3,7 +3,7 @@ using Chat.Server.Net;
 
 namespace Chat.Server.Data;
 
-public class User : ISavableObject
+public class User
 {
     public uint Id { get; }
 
@@ -40,8 +40,6 @@ public class User : ISavableObject
         Client?.Session.Send(packet, dispose);
     }
 
-
-    public void Save() { }
 
     public virtual void OnDisconnected()
     {

@@ -153,6 +153,8 @@ namespace Chat.Client.ViewModels
         [Reactive]
         public string SearchTerm { get; set; } = string.Empty;
 
+        public ReactiveCommand<Unit, Unit> EditProfileCommand { get; }
+
         private readonly Window _window;
         private SoundPlayer? _player;
 
@@ -169,6 +171,7 @@ namespace Chat.Client.ViewModels
             ResumeCommand = ReactiveCommand.Create(ResumeMusic);
             PauseCommand = ReactiveCommand.Create(PauseMusic);
             OpenUserInfoCommand = ReactiveCommand.Create(OpenUserInfo);
+            EditProfileCommand = ReactiveCommand.Create(EditProfile);
 
             _musicTimer = new Timer(state =>
             {
@@ -473,6 +476,17 @@ namespace Chat.Client.ViewModels
                 var match = Users.FirstOrDefault(x => x.Id == SelectedUser.Id, null);
                 var window = new AddFriendWindow();
                 var player = new UserInfoViewModel(SelectedUser, Friends.Any(x => x.Id == match.Id), this);
+                window.DataContext = player;
+                window.ShowDialog(_window);
+            });
+        }
+
+        private void EditProfile()
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                var window = new EditProfileWindow();
+                var player = new EditProfileViewModel(Users.First(x => x.Id == UserId));
                 window.DataContext = player;
                 window.ShowDialog(_window);
             });

@@ -23,7 +23,8 @@ public class RemoveFriendHandler : AbstractHandler
             User = new()
             {
                 Id = account[0].id,
-                Name = account[0].name
+                Name = account[0].name,
+                Message = account[0].message,
             }
         };
 

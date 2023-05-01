@@ -37,6 +37,8 @@ internal class ChatServer : TcpServer
 
     public IEnumerable<Channel> GetChannels(uint userId) => _channels.Where(x => x.Users.Any(y => y.Id == userId)).ToImmutableList();
 
+    public IEnumerable<ChannelUser> GetChannelUsers(uint userId) => _channels.SelectMany(x => x.Users.Where(y => y.Id == userId)).ToImmutableList();
+
     public Channel? GetChannel(uint channelId) => _channels.FirstOrDefault(x => x.Id == channelId, null);
 
     public List<Channel> GetAllChannels() => _channels.ToList();

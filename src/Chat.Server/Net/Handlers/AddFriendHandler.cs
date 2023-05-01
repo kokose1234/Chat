@@ -24,6 +24,7 @@ public class AddFriendHandler : AbstractHandler
             {
                 Id = account[0].id,
                 Name = account[0].name,
+                Message = account[0].message,
             }
         };
 

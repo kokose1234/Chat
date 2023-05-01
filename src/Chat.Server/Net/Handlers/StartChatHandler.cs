@@ -59,7 +59,8 @@ public class StartChatHandler : AbstractHandler
             data.Users.Add(new()
             {
                 Id = user.Id,
-                Name = user.Nickname
+                Name = user.Nickname,
+                Message = user.Message,
             });
         }
 

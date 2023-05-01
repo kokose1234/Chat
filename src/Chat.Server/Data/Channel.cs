@@ -8,7 +8,7 @@ using Chat.Server.Net;
 
 namespace Chat.Server.Data;
 
-public sealed class Channel : ISavableObject
+public sealed class Channel
 {
     public uint Id { get; }
 
@@ -75,10 +75,5 @@ public sealed class Channel : ISavableObject
         }
 
         packet.Dispose();
-    }
-
-    public void Save()
-    {
-        throw new NotImplementedException();
     }
 }

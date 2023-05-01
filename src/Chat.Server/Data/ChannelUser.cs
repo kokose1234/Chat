@@ -11,8 +11,6 @@ public sealed class ChannelUser : User
         IsAdmin = isAdmin;
     }
 
-    public new void Save() { }
-
     public override void OnDisconnected()
     {
         base.OnDisconnected();

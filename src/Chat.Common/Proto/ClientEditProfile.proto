@@ -4,5 +4,6 @@ option csharp_namespace = "Chat.Common.Packet.Data.Client";
 
 message ClientEditProfile {
   string Name = 1;
-  optional bytes Picture = 2;
+  string Message = 2;
+  bytes Picture = 3;
 }
