@@ -6,12 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Chat.Client.Data.Types;
 using Chat.Client.Database;
+using Chat.Client.Database.Entities;
 using Chat.Client.Database.Repositories;
 using Chat.Client.Tools;
 using Chat.Common.Net;
 using Chat.Common.Net.Packet;
 using Chat.Common.Net.Packet.Header;
 using Chat.Common.Packet.Data.Server;
+using LiteDB;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
@@ -32,6 +34,9 @@ public class MessageHandler : AbstractHandler
         var data = inPacket.Decode<ServerMessage>();
         var channel = session.ViewModel.Channels.FirstOrDefault(x => x.Id == data.Message.ChannelId);
         if (channel == null) return Task.CompletedTask;
+
+        var repo = DatabaseManager.GetRepository<ImageRepository>();
+        var messageRepo = DatabaseManager.GetRepository<MessageRepository>();
 
         if (channel is {IsSecret: true, Key.Length: 0})
         {
@@ -59,6 +64,18 @@ public class MessageHandler : AbstractHandler
                 if (message.Message.Attachment != null) message.Message.Attachment = Util.Decrypt(message.Message.Attachment, channel.Key);
             }
 
+            var messageEntity = new MessageEntity
+            {
+                Id = ObjectId.NewObjectId(),
+                ChannelId = message.Message.ChannelId,
+                MessageId = message.Message.Id,
+                UserId = message.Message.Sender,
+                Timestamp = message.Message.Date ?? DateTime.Now,
+                Content = Encoding.UTF8.GetString(message.Message.Text),
+                HasAttachment = message.Message.Attachment != null
+            };
+            messageRepo.AddMessage(messageEntity);
+
             if (message.Message.Attachment == null)
             {
                 session.ViewModel.AddMessage(message.Message);
@@ -74,7 +91,6 @@ public class MessageHandler : AbstractHandler
             {
                 case AttachmentType.Image:
                 {
-                    var repo = DatabaseManager.GetRepository<ImageRepository>();
                     using var image = Image.Load(fileData);
                     using var stream = new MemoryStream(fileData);
                     var randomName = Util.GetRandomFileName();

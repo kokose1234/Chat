@@ -252,6 +252,18 @@ namespace Chat.Client.ViewModels
             }
         }
 
+        public void AddMessage(ChatMessage message)
+        {
+            Channels.First(x => x.Id == message.ChannelId).Description = message.Message;
+            Messages.Add(message);
+
+            if (SelectedChannel != null && SelectedChannel.Id == message.ChannelId)
+            {
+                CurrentMessages.Add(new MessageViewModel(message.SenderName, message.Message, message.Time.ToString("yyyy-MM-dd tt h:mm"), message.SenderId == UserId));
+                OnMessageAdded?.Invoke();
+            }
+        }
+
         public void AddImageMessage(Message message)
         {
             var msg = new ChatMessage

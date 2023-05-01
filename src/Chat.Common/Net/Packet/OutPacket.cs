@@ -24,7 +24,7 @@ public class OutPacket : AbstractPacket
 
     public OutPacket(ClientHeader header) : this((uint) header) { }
 
-    public void Encode<T>(T data)
+    public void Encode<T>(T data) where T : IExtensible
     {
         ThrowIfDisposed();
         Serializer.Serialize(stream, data);

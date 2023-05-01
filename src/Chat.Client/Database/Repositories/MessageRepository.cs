@@ -20,7 +20,7 @@ public class MessageRepository : RepositoryBase<MessageEntity>
         var result = Collection.Query()
                                .Where(x => x.ChannelId == channelId)
                                .OrderBy(x => x.MessageId)
-                               .ToEnumerable();
+                               .ToList();
         return result;
     }
 
@@ -28,7 +28,7 @@ public class MessageRepository : RepositoryBase<MessageEntity>
     {
         var result = Collection.Query()
                                .OrderBy(x => x.MessageId)
-                               .ToEnumerable();
+                               .ToList();
         return result;
     }
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Chat.Client.Database;
 using Chat.Client.Database.Repositories;
@@ -74,6 +75,7 @@ public class ChannelSyncHandler : AbstractHandler
                     SenderId = messageEntity.UserId,
                     SenderName = session.ViewModel.Users.FirstOrDefault(x => x.Id == messageEntity.UserId)?.Name ?? "(null)",
                     Message = messageEntity.Content,
+                    Attachment = messageEntity.HasAttachment ? Array.Empty<byte>() : null,
                     Time = messageEntity.Timestamp
                 };
 
